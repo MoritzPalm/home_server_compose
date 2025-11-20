@@ -1,0 +1,44 @@
+version: '3.9'
+
+services:
+
+   homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    environment:
+      - HOMEPAGE_VAR_TITLE=MServer
+      - HOMEPAGE_VAR_SEARCH_PROVIDER=google
+      - HOMEPAGE_VAR_HEADER_STYLE=boxed
+      - HOMEPAGE_VAR_WEATHER_CITY=Erlangen
+      - HOMEPAGE_VAR_WEATHER_LAT=49.5897
+      - HOMEPAGE_VAR_WEATHER_LONG=11.0120
+      - HOMEPAGE_VAR_WEATHER_TIME=Europe/Berlin
+      - HOMEPAGE_VAR_WEATHER_UNIT=metric
+      - PORT=3123
+      - HOMEPAGE_ALLOWED_HOSTS=moritzpalm.com
+    volumes:
+      - $CONFIG_PATH:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./data:/data
+    restart: always
+    #command: [sh, -c, "cp -n /app/config/tpl/*.yaml /app/config && node server.js"]
+    networks:
+      - internal
+      - external
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.homepage.entrypoints=websecure"
+      - "traefik.http.routers.homepage.rule=Host(`moritzpalm.com`)"
+      - "traefik.http.routers.homepage.tls=true"
+      - "traefik.http.routers.homepage.tls.certresolver=cloudflare"
+      - "traefik.http.routers.homepage.service=homepage"
+      - "traefik.http.services.homepage.loadbalancer.server.port=3123"
+      - "traefik.docker.network=external"
+
+
+
+networks:
+  external:
+    external: true
+  internal:
+    external: true

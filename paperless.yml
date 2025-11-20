@@ -1,0 +1,96 @@
+
+services:
+  broker:
+    image: docker.io/library/redis:7
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+    networks:
+      - paperless
+
+  db:
+    image: docker.io/library/postgres:16
+    restart: unless-stopped
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: paperless
+      POSTGRES_USER: paperless
+      POSTGRES_PASSWORD: paperless
+    networks:
+      - paperless
+
+  webserver:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    container_name: paperless
+    restart: unless-stopped
+    depends_on:
+      - db
+      - broker
+      - gotenberg
+      - tika
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://192.168.178.174:8001"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - /media/hdd1/paperless/data:/usr/src/paperless/data
+      - /media/hdd1/paperless/media:/usr/src/paperless/media
+      - /home/moritzpalm/paperless-ngx/export:/usr/src/paperless/export
+      - /home/moritzpalm/paperless-ngx/consume:/usr/src/paperless/consume
+    env_file: stack.env
+    environment:
+      PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_DBHOST: db
+      PAPERLESS_TIKA_ENABLED: 1
+      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
+      PAPERLESS_TIKA_ENDPOINT: http://tika:9998
+      PAPERLESS_OCR_USER_ARGS: '{"invalidate_digital_signatures": true, "continue_on_soft_render_error": true}'
+    security_opt:
+       - no-new-privileges:true 
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.routers.paperless.entrypoints=websecure"
+      - "traefik.http.routers.paperless.rule=Host(`paperless.local.moritzpalm.com`)"
+      - "traefik.http.routers.paperless.tls=true"
+      - "traefik.http.routers.paperless.service=paperless"
+      - "traefik.http.services.paperless.loadbalancer.server.port=80"
+      - "traefik.docker.network=internal"
+    ports:
+      - 8001:8000
+    
+    networks:
+      - paperless
+      - internal
+
+  gotenberg:
+    image: docker.io/gotenberg/gotenberg:7.10
+    restart: unless-stopped
+
+    # The gotenberg chromium route is used to convert .eml files. We do not
+    # want to allow external content like tracking pixels or even javascript.
+    command:
+      - "gotenberg"
+      - "--chromium-disable-javascript=true"
+      - "--chromium-allow-list=file:///tmp/.*"
+    networks:
+      - paperless
+
+  tika:
+    image: docker.io/apache/tika:latest
+    restart: unless-stopped
+    networks:
+      - paperless
+
+volumes:
+  data:
+  media:
+  pgdata:
+  redisdata:
+
+networks:
+  paperless:
+  internal:
+    external: true
