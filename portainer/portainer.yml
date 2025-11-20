@@ -9,7 +9,7 @@ services:
     ports:
       - 9443:9443
     env_file: 
-      - path: .env
+      - path: ./.env
       - required: true
 
 volumes:
