@@ -8,7 +8,9 @@ services:
       - portainer_data:/data
     ports:
       - 9443:9443
-    env_file: ".env"
+    env_file: 
+      - path: .env
+      - required: true
 
 volumes:
   portainer_data:
