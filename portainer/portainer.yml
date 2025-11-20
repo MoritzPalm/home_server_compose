@@ -10,7 +10,7 @@ services:
       - 9443:9443
     env_file: 
       - path: ./.env
-      - required: true
+        required: true
 
 volumes:
   portainer_data:
