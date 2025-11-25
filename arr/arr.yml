@@ -29,7 +29,7 @@ services:
       - TZ=Europe/Berlin
     volumes:
       - ${CONFIG_DIR}/sonarr:/config # database and Radarr configs
-      - $MEDIA_PATH:/data # location of media and qbittorrent download folder
+      - ${MEDIA_PATH}:/data # location of media and qbittorrent download folder
     security_opt:
        - no-new-privileges:true 
     ports:
