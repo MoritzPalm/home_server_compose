@@ -8,7 +8,7 @@ services:
       - TZ=Europe/Berlin
       - VERSION=docker
       - HOSTNAME="PLEX_SERVER"
-      - PLEX_CLAIM=claim-JUUx3yALjP2kk6gGTgd8
+      - PLEX_CLAIM=claim-n3RF9y2y2jn6_pcRV-SQ
     ports:
        - 32401:32400/tcp
        - 32401:32400/udp
