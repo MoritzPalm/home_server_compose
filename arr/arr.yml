@@ -203,8 +203,8 @@ services:
       - TZ=Etc/UTC
     volumes:
       - ${CONFIG_DIR}/bazarr:/config
-      - $MEDIA_PATH/media/movies:/movies #optional
-      - $MEDIA_PATH/media/tv:/tv #optional
+      - ${MEDIA_PATH}/movies:/movies #optional
+      - ${MEDIA_PATH}/tv:/tv #optional
     ports:
       - 6767:6767
     restart: unless-stopped
@@ -219,11 +219,9 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-    networks:
-      - internal
     volumes:
       - ${CONFIG_DIR}/whisparr:/config
-      - $MEDIA_PATH/:/data
+      - ${MEDIA_PATH}:/data
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
 
