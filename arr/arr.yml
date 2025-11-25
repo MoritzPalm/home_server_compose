@@ -1,11 +1,3 @@
-version: "3.8"
-
-networks:
-  external:
-    external: true
-  internal:
-    external: true
-
 services:
 
   # image used to index torrent links from the internet
@@ -17,7 +9,7 @@ services:
       - PGID=1000
       - TZ=Europe/Berlin
     volumes:
-      - /docker-configs/prowlarr:/config # database and Prowlarr configs
+      - ${CONFIG_DIR}/prowlarr:/config # database and Prowlarr configs
     security_opt:
       - no-new-privileges:true 
     ports:
@@ -27,29 +19,7 @@ services:
       interval: 30s
       retries: 10
     restart: unless-stopped
-    networks:
-      - internal
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.prowlarr.entrypoints=websecure"
-      - "traefik.http.routers.prowlarr.rule=Host(`prowlarr.moritzpalm.com`)"
-      - "traefik.http.routers.prowlarr.tls=true"
-      - "traefik.http.routers.prowlarr.tls.certresolver=cloudflare"
-      - "traefik.http.routers.prowlarr.service=prowlarr"
-      - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
-      # Optional part for traefik middlewares
-      #- traefik.http.routers.prowlarr.middlewares=local-ipwhitelist@file
-      - homepage.group=Downloader
-      - homepage.name=Prowlarr
-      - homepage.icon=prowlarr.png
-      - homepage.href=https://prowlarr.moritzpalm.com
-      - homepage.description=Indexer Manager
-      - homepage.widget.type=prowlarr
-      - homepage.widget.url=http://prowlarr:9696
-      - homepage.widget.key=$PROWLARR_API_KEY
-      - homepage.widget.fields=["numberOfGrabs", "numberOfQueries", "numberOfFailGrabs", "numberOfFailQueries"]
-
-  # image used to scan for tv shows
+      
   sonarr:
     image: linuxserver/sonarr:latest
     container_name: sonarr
@@ -58,7 +28,7 @@ services:
       - PGID=1000
       - TZ=Europe/Berlin
     volumes:
-      - ./docker-configs/sonarr:/config # database and Radarr configs
+      - ${CONFIG_DIR}/sonarr:/config # database and Radarr configs
       - $MEDIA_PATH:/data # location of media and qbittorrent download folder
     security_opt:
        - no-new-privileges:true 
@@ -69,30 +39,8 @@ services:
       interval: 30s
       retries: 10
     restart: unless-stopped
-    networks:
-      - internal
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.sonarr.entrypoints=websecure"
-      - "traefik.http.routers.sonarr.rule=Host(`sonarr.moritzpalm.com`) || Host(`sonarr.local.moritzpalm.com`)"
-      - "traefik.http.routers.sonarr.tls=true"
-      - "traefik.http.routers.sonarr.tls.certresolver=cloudflare"
-      - "traefik.http.routers.sonarr.service=sonarr"
-      - "traefik.http.services.sonarr.loadbalancer.server.port=8989"
-    #  # Optional part for traefik middlewares
-    #  - traefik.http.routers.sonarr.middlewares=local-ipwhitelist@file
-      - homepage.group=Downloader
-      - homepage.name=Sonarr
-      - homepage.icon=sonarr.png
-      - homepage.href=https://sonarr.moritzpalm.com
-      - homepage.description=Series Indexer
-      - homepage.widget.type=sonarr
-      - homepage.widget.url=http://sonarr:8989
-      - homepage.widget.key=$SONARR_API_KEY
-      - homepage.widget.enableQueue=true
-      - homepage.widget.fields=["wanted", "queued", "series"]
 
-  # image used to scan for movies
+ 
   radarr:
     image: linuxserver/radarr:latest
     container_name: radarr
@@ -101,8 +49,8 @@ services:
       - PGID=1000
       - TZ=Europe/Berlin
     volumes:
-      - /docker-configs/radarr:/config
-      - $MEDIA_PATH:/data # location of media and qbittorrent download folder
+      - ${CONFIG_DIR}/radarr:/config
+      - ${MEDIA_PATH}:/data # location of media and qbittorrent download folder
     security_opt:
      - no-new-privileges:true 
     ports:
@@ -112,30 +60,8 @@ services:
       interval: 30s
       retries: 10
     restart: unless-stopped
-    networks:
-      - internal
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.radarr.entrypoints=websecure"
-      - "traefik.http.routers.radarr.rule=Host(`radarr.moritzpalm.com`) || Host(`radarr.local.moritzpalm.com`)"
-      - "traefik.http.routers.radarr.tls=true"
-      - "traefik.http.routers.radarr.tls.certresolver=cloudflare"
-      - "traefik.http.routers.radarr.service=radarr"
-      - "traefik.http.services.radarr.loadbalancer.server.port=7878"
-    #  # Optional part for traefik middlewares
-    #  - traefik.http.routers.sonarr.middlewares=local-ipwhitelist@file
-      - homepage.group=Downloader
-      - homepage.name=Radarr
-      - homepage.icon=radarr.png
-      - homepage.href=https://radarr.moritzpalm.com
-      - homepage.description=Movies Indexer
-      - homepage.widget.type=radarr
-      - homepage.widget.url=http://radarr:7878
-      - homepage.widget.key=$RADARR_API_KEY
-      - homepage.widget.enableQueue=true
-      - homepage.widget.fields=["wanted", "missing", "queued", "movies"]
 
-  # image used to scan for music
+
   lidarr:
     image: linuxserver/lidarr:latest
     container_name: lidarr
@@ -144,8 +70,8 @@ services:
       - PGID=1000
       - TZ=Europe/Berlin
     volumes:
-      - /docker-configs/lidarr:/config
-      - $MEDIA_PATH:/data # location of media and qbittorrent download folder
+      - ${CONFIG_DIR}/lidarr:/config
+      - ${MEDIA_PATH}:/data # location of media and qbittorrent download folder
     security_opt:
      - no-new-privileges:true 
     expose:
@@ -157,27 +83,6 @@ services:
     ports:
       - 8686:8686/tcp # web ui
     restart: unless-stopped
-    networks:
-      - internal
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.lidarr.entrypoints=websecure"
-      - "traefik.http.routers.lidarr.rule=Host(`lidarr.moritzpalm.com`) || Host(`lidarr.local.moritzpalm.com`)"
-      - "traefik.http.routers.lidarr.tls=true"
-      - "traefik.http.routers.lidarr.tls.certresolver=cloudflare"
-      - "traefik.http.routers.lidarr.service=lidarr"
-      - "traefik.http.services.lidarr.loadbalancer.server.port=8686"
-    #  # Optional part for traefik middlewares
-    #  - traefik.http.routers.sonarr.middlewares=local-ipwhitelist@file
-      - homepage.group=Downloader
-      - homepage.name=Lidarr
-      - homepage.icon=lidarr.png
-      - homepage.href=https://lidarr.moritzpalm.com
-      - homepage.description=Music Indexer
-      - homepage.widget.type=lidarr
-      - homepage.widget.url=http://lidarr:8686
-      - homepage.widget.key=$LIDARR_API_KEY
-      - homepage.widget.fields=["wanted", "queued", "artists"]
       
 
   # image used to scan for books
@@ -189,8 +94,8 @@ services:
       - PGID=1000
       - TZ=Europe/Berlin
     volumes:
-      - /docker-configs/readarr:/config
-      - $MEDIA_PATH:/data # location of media and qbittorrent download folder
+      - ${CONFIG_DIR}/readarr:/config
+      - ${MEDIA_PATH}:/data # location of media and qbittorrent download folder
     security_opt:
      - no-new-privileges:true
     ports:
@@ -200,47 +105,17 @@ services:
       interval: 30s
       retries: 10
     restart: unless-stopped
-    networks:
-      - internal
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.readarr.entrypoints=websecure"
-      - "traefik.http.routers.readarr.rule=Host(`readarr.moritzpalm.com`) || Host(`readarr.local.moritzpalm.com`)"
-      - "traefik.http.routers.readarr.tls=true"
-      - "traefik.http.routers.readarr.tls.certresolver=cloudflare"
-      - "traefik.http.routers.readarr.service=readarr"
-      - "traefik.http.services.readarr.loadbalancer.server.port=8787"
-    #  # Optional part for traefik middlewares
-    #  - traefik.http.routers.sonarr.middlewares=local-ipwhitelist@file
-      - homepage.group=Downloader
-      - homepage.name=Readarr
-      - homepage.icon=readarr.png
-      - homepage.href=https://readarr.moritzpalm.com
-      - homepage.description=Books Indexer
-      - homepage.widget.type=readarr
-      - homepage.widget.url=http://readarr:8787
-      - homepage.widget.key=$READARR_API_KEY
-      - homepage.widget.fields=["wanted", "queued", "books"]
-
+ 
 
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
     container_name: flaresolverr
     restart: always
-    networks:
-      - internal
     environment:
       - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
-      - TZ=${TIMEZONE}
+      - TZ=Europe/Berlin
     ports:
       - 8191:8191
-
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.flaresolverr.rule=PathPrefix(`/flaresolverr`)
-      - traefik.http.routers.flaresolverr.tls=true
-      - traefik.http.services.flaresolverr.loadbalancer.server.port=8191
-
 
 
   # image used for vpn killswitch network
@@ -260,8 +135,8 @@ services:
       # see https://github.com/qdm12/gluetun-wiki for more details
       # example envs based on https://github.com/qdm12/gluetun-wiki/blob/main/setup/providers/mullvad.md
       - VPN_SERVICE_PROVIDER=protonvpn # define the vpn provider
-      - OPENVPN_USER=$OPENVPN_USERNAME
-      - OPENVPN_PASSWORD=$OPENVPN_PASSWORD
+      - OPENVPN_USER=${OPENVPN_USERNAME}
+      - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
       - VPN_PORT_FORWARDING=on
       - FIREWALL_VPN_INPUT_PORTS=8088
       - EXTRA_SUBNETS=192.168.178.0/24
@@ -271,12 +146,10 @@ services:
       - VPN_PORT_FORWARDING_UP_COMMAND=/bin/sh -c 'wget -O- --retry-connrefused --post-data "json={\"listen_port\":{{PORTS}}}" http://127.0.0.1:8088/api/v2/app/setPreferences 2>&1'
       #- IPV6_ENABLED=false
     volumes:
-      - /docker-configs/gluetun:/gluetun
+      - ${CONFIG_DIR}/gluetun:/gluetun
     security_opt:
      - no-new-privileges:true
     restart: unless-stopped
-    networks:
-      - internal
 
 
   # image used to download stuff; run over gluetun network (vpn killswitch)
@@ -295,7 +168,7 @@ services:
       - TZ=Europe/Berlin
       - WEBUI_PORT=8088
     volumes:
-      - /docker-configs/qbittorrent:/config
+      - ${CONFIG_DIR}/qbittorrent:/config
       - $TORRENT_PATH:/data/torrents
 
     depends_on:
@@ -309,34 +182,16 @@ services:
     container_name: overseerr
     environment:
       - LOG_LEVEL=debug
-      - TZ=$TIMEZONE
+      - TZ=Europe/Berlin
       - PORT=5055 #optional
     ports:
       - 5055:5055
     security_opt:
      - no-new-privileges:true
     volumes:
-      - ./config:/app/config
+      - ${CONFIG_DIR}/overseerr:/app/config
     restart: unless-stopped
-    networks:
-      - internal
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.overseerr.entrypoints=websecure"
-      - "traefik.http.routers.overseerr.rule=Host(`overseerr.moritzpalm.com`) || Host(`overseerr.local.moritzpalm.com`)"
-      - "traefik.http.routers.overseerr.tls=true"
-      - "traefik.http.routers.overseerr.tls.certresolver=cloudflare"
-      - "traefik.http.routers.overseerr.service=overseerr"
-      - "traefik.http.services.overseerr.loadbalancer.server.port=5055"
-      - homepage.group=Downloader
-      - homepage.name=Overseerr
-      - homepage.icon=overseerr.png
-      - homepage.href=https://overseerr.moritzpalm.com
-      - homepage.description=Media Request
-      - homepage.widget.type=overseerr
-      - homepage.widget.url=http://overseerr:5055
-      - homepage.widget.key=$OVERSEERR_API_KEY
-      - homepage.widget.fields=["pending", "approved", "available", "processing"]
+
 
 
   bazarr:
@@ -347,7 +202,7 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - /docker-configs/bazarr:/config
+      - ${CONFIG_DIR}/bazarr:/config
       - $MEDIA_PATH/media/movies:/movies #optional
       - $MEDIA_PATH/media/tv:/tv #optional
     ports:
@@ -367,7 +222,7 @@ services:
     networks:
       - internal
     volumes:
-      - /docker-configs/whisparr:/config
+      - ${CONFIG_DIR}/whisparr:/config
       - $MEDIA_PATH/:/data
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
@@ -380,27 +235,5 @@ services:
       - ./mamapi/data:/data
     environment:
       TZ: Etc/UTC
-      MAM_ID: $MAM_SESSION_ID
-
-  #seedboxapi:
-  #  image: myanonamouse/seedboxapi
-  #  container_name: seedboxapi
-   # network_mode: "service:gluetun"
-   # entrypoint: sh -c "rm -f /config/MAM.cookies && exec /wrapper.sh"
-   # volumes:
-   #   - /docker-configs/seedboxapi:/config
-   # depends_on:
-   #   gluetun:
-   #     condition: service_healthy
-    #environment:
-    #  - PUID=1000
-     # - PGID=1000
-      #- TZ=Europe/Berlin
-      #- DEBUG=1
-      #- mam_id=$MAM_SESSION_ID
-      #- interval=1
-
-
-
-
+      MAM_ID: ${MAM_SESSION_ID}
 
