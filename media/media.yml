@@ -26,7 +26,7 @@ services:
     volumes:
       - "./config:/config"
       - "./transcode:/transcode"
-      - "{{ media_path }}:/data/media"
+      - "${MEDIA_PATH}:/data/media"
 
 
 
