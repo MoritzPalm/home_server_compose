@@ -24,9 +24,9 @@ services:
       - "/dev/dri:/dev/dri" # Binds the Intel Quicksync decoder to Plex HW Transcode
 
     volumes:
-      - ./config:/config
-      - ./transcode:/transcode
-      - /mnt/storage/media:/data/media
+      - "./config:/config"
+      - "./transcode:/transcode"
+      - "{{ media_path }}:/data/media"
 
 
 
