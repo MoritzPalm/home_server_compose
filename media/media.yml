@@ -4,7 +4,6 @@ services:
   plex-server:
     container_name: plex
     image: 'plexinc/pms-docker:latest'
-    restart: unless-stopped
     restart: always
     environment:
       - TZ=Europe/Berlin
