@@ -166,10 +166,12 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Berlin
-      - WEBUI_PORT=8088
     volumes:
       - ${CONFIG_DIR}/qbittorrent:/config
       - $TORRENT_PATH:/data/torrents
+    env_file:
+      - ./.env
+      - ./qbittorrent.env
 
     depends_on:
       gluetun:
