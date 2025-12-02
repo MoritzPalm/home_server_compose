@@ -1,6 +1,5 @@
 services:
 
-  # image used to index torrent links from the internet
   prowlarr:
     image: linuxserver/prowlarr:latest
     container_name: prowlarr
@@ -182,7 +181,7 @@ services:
 
   overseerr:
     image: sctx/overseerr:latest
-   container_name: overseerr
+    container_name: overseerr
     environment:
       - LOG_LEVEL=debug
       - TZ=Europe/Berlin
