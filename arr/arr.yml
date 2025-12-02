@@ -230,10 +230,30 @@ services:
   mamapi:
     image: elforkhead/mamapi:latest
     # also available at ghcr.io/elforkhead/mamapi:latest
+  container_name: mam_api
     network_mode: "service:gluetun"
     volumes:
       - ./mamapi/data:/data
     environment:
       TZ: Etc/UTC
       MAM_ID: ${MAM_SESSION_ID}
+
+
+  slskd:
+    image: slskd/slskd:latest
+    container_name: slskd
+    user: 1000:1000
+    ports: 
+      - "5030:5030"
+      - "5031:5031"
+      - "50300:50300"
+    environment:
+      - SLSKD_REMOTE_CONFIGURATION=true
+    volumes:
+      - ${CONFIG_DIR}/slskd:/app
+      - ${MEDIA_PATH}/music:/music:rw
+      - ${MEDIA_PATH}/books:/ebooks:rw
+
+
+
 
