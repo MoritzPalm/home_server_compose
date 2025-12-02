@@ -247,6 +247,7 @@ services:
       - SLSKD_REMOTE_CONFIGURATION=true
       - SLSKD_DOWNLOADS_DIR=/downloads/complete
       - SLSKD_INCOMPLETE_DIR=/downloads/incomplete
+      - SLSKD_SHARED_DIR=/music,/ebooks
     volumes:
       - ${CONFIG_DIR}/slskd:/app
       - ${MEDIA_PATH}/music:/music:rw
@@ -267,7 +268,7 @@ services:
       - TZ=Europe/Berlin
       - SCCRIPT_INTERVAL=300
     volumes:
-      - ${TORRENT_DIR}/downloads/complete:/downloads
+      - ${TORRENT_PATH}/downloads/complete:/downloads
       - ${CONFIG_DIR}/soularr:/data
    
 
