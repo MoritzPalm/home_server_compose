@@ -230,7 +230,7 @@ services:
   mamapi:
     image: elforkhead/mamapi:latest
     # also available at ghcr.io/elforkhead/mamapi:latest
-  container_name: mam_api
+    container_name: mam_api
     network_mode: "service:gluetun"
     volumes:
       - ./mamapi/data:/data
