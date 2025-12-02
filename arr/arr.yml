@@ -126,6 +126,7 @@ services:
       - NET_ADMIN
     ports:
       - 8088:8088 # qbittorrent http web ui
+      - 5030:5030 # soulseek web ui
     healthcheck:
       test: ping -c 1 www.google.com || exit 1
       interval: 30s
@@ -243,10 +244,6 @@ services:
     image: slskd/slskd:latest
     container_name: slskd
     user: 1000:1000
-    ports: 
-      - "5030:5030"
-      - "5031:5031"
-      - "50300:50300"
     environment:
       - SLSKD_REMOTE_CONFIGURATION=true
       - SLSKD_DOWNLOADS_DIR=/downloads/complete
