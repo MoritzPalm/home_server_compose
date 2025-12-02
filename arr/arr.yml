@@ -182,7 +182,7 @@ services:
 
   overseerr:
     image: sctx/overseerr:latest
-    container_name: overseerr
+   container_name: overseerr
     environment:
       - LOG_LEVEL=debug
       - TZ=Europe/Berlin
@@ -252,7 +252,7 @@ services:
       - ${CONFIG_DIR}/slskd:/app
       - ${MEDIA_PATH}/music:/music:rw
       - ${MEDIA_PATH}/books:/ebooks:rw
-      - ${TORRENT_PATH}/downloads:/downloads:rw
+      - ${TORRENT_PATH}:/downloads:rw
     depends_on:
       gluetun:
         condition: service_healthy
