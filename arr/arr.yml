@@ -247,7 +247,7 @@ services:
       - SLSKD_REMOTE_CONFIGURATION=true
       - SLSKD_DOWNLOADS_DIR=/downloads/complete
       - SLSKD_INCOMPLETE_DIR=/downloads/incomplete
-      - SLSKD_SHARED_DIR=/music,/ebooks
+      - SLSKD_SHARED_DIR=/music
     volumes:
       - ${CONFIG_DIR}/slskd:/app
       - ${MEDIA_PATH}/music:/music:rw
