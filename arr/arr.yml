@@ -169,7 +169,7 @@ services:
       - TZ=Europe/Berlin
     volumes:
       - ${CONFIG_DIR}/qbittorrent:/config
-      - $TORRENT_PATH:/data/torrents
+      - ${TORRENT_PATH}:/data/torrents
     env_file:
       - ./.env
       - ./qbittorrent.env
@@ -252,7 +252,7 @@ services:
       - ${CONFIG_DIR}/slskd:/app
       - ${MEDIA_PATH}/music:/music:rw
       - ${MEDIA_PATH}/books:/ebooks:rw
-      - ${TORRENT_DIR}/downloads:/downloads:rw
+      - ${TORRENT_PATH}/downloads:/downloads:rw
     depends_on:
       gluetun:
         condition: service_healthy
