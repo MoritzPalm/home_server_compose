@@ -71,6 +71,7 @@ services:
     volumes:
       - ${CONFIG_DIR}/lidarr:/config
       - ${MEDIA_PATH}:/data # location of media and qbittorrent download folder
+      - ${TORRENT_PATH}:/downloads
     security_opt:
      - no-new-privileges:true 
     expose:
@@ -264,7 +265,7 @@ services:
       - TZ=Europe/Berlin
       - SCCRIPT_INTERVAL=300
     volumes:
-      - ${TORRENT_PATH}/downloads/complete:/downloads
+      - ${TORRENT_PATH}/complete:/downloads
       - ${CONFIG_DIR}/soularr:/data
    
 
