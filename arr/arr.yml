@@ -233,12 +233,15 @@ services:
     image: elforkhead/mamapi:latest
     # also available at ghcr.io/elforkhead/mamapi:latest
     container_name: mam_api
+    restart: unless-stopped
     network_mode: "service:gluetun"
     volumes:
       - ./mamapi/data:/data
     environment:
       TZ: Etc/UTC
       MAM_ID: ${MAM_SESSION_ID}
+      WRITE_CURRENT_MAMID: True
+      SHUTDOWN_ON_DISCONNECT: True
 
 
   slskd:
