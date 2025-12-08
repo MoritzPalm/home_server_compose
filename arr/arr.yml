@@ -3,6 +3,11 @@ services:
   prowlarr:
     image: linuxserver/prowlarr:latest
     container_name: prowlarr
+    # using a vpn here is mainly to use the existing MAM Session which is dynamically updated by the mam_api container
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    network_mode: service:gluetun
     environment:
       - PUID=1000
       - PGID=1000
@@ -238,7 +243,7 @@ services:
     volumes:
       - ./mamapi/data:/data
     environment:
-      TZ: Etc/UTC
+      TZ: Europe/Berlin 
       MAM_ID: ${MAM_SESSION_ID}
       WRITE_CURRENT_MAMID: True
       SHUTDOWN_ON_DISCONNECT: True
