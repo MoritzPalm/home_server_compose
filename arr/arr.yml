@@ -16,8 +16,6 @@ services:
       - ${CONFIG_DIR}/prowlarr:/config # database and Prowlarr configs
     security_opt:
       - no-new-privileges:true 
-    ports:
-      - 9696:9696/tcp # web ui
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:9696/prowlarr/ping" ]
       interval: 30s
@@ -133,6 +131,7 @@ services:
       - 8088:8088 # qbittorrent http web ui
       - 5030:5030 # soulseek web ui
       - 5031:5031 # soulseek https web ui
+      - 9696:9696 # prowlarr web ui
     healthcheck:
       test: ping -c 1 www.google.com || exit 1
       interval: 30s
