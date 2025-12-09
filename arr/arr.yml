@@ -304,7 +304,7 @@ services:
 
 
   profilarr:
-    image: santiagesayshey/profilarr:latest
+    image: santiagosayshey/profilarr:latest
     container_name: profilarr
     ports:
       - 6868:6868
