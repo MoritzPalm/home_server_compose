@@ -48,6 +48,7 @@ services:
     restart: unless-stopped
     networks:
       - arr
+      - default
 
  
   radarr:
@@ -72,6 +73,7 @@ services:
     restart: unless-stopped
     networks:
       - arr
+      - default
 
 
   lidarr:
@@ -96,7 +98,8 @@ services:
       retries: 10
     restart: unless-stopped
     networks:
-      - arr 
+      - arr
+      - default
  
 
   flaresolverr:
@@ -113,6 +116,7 @@ services:
       - 8191:8191
     networks:
       - arr
+      - default
 
 
   # image used for vpn killswitch network
@@ -198,7 +202,8 @@ services:
       - ${CONFIG_DIR}/overseerr:/app/config
     restart: unless-stopped
     networks:
-      - arr 
+      - arr
+      - default
 
 
 
@@ -219,6 +224,7 @@ services:
     restart: unless-stopped
     networks:
       - arr
+      - default
 
 
   whisparr:
@@ -238,6 +244,7 @@ services:
       - "com.centurylinklabs.watchtower.enable=false"
     networks:
       - arr
+      - default
 
   mamapi:
     image: elforkhead/mamapi:latest
