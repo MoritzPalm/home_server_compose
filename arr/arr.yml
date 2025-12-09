@@ -1,3 +1,7 @@
+networks:
+  arr:
+    driver: bridge
+
 services:
 
   prowlarr:
@@ -16,8 +20,6 @@ services:
       - ${CONFIG_DIR}/prowlarr:/config # database and Prowlarr configs
     security_opt:
       - no-new-privileges:true 
-    ports:
-      - 9696:9696/tcp # web ui
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:9696/prowlarr/ping" ]
       interval: 30s
@@ -43,6 +45,8 @@ services:
       interval: 30s
       retries: 10
     restart: unless-stopped
+    networks:
+      - arr
 
  
   radarr:
@@ -64,6 +68,8 @@ services:
       interval: 30s
       retries: 10
     restart: unless-stopped
+    networks:
+      - arr
 
 
   lidarr:
@@ -88,28 +94,8 @@ services:
     ports:
       - 8686:8686/tcp # web ui
     restart: unless-stopped
-      
-
-  # image used to scan for books
-  readarr:
-    image: linuxserver/readarr:develop
-    container_name: readarr
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Berlin
-    volumes:
-      - ${CONFIG_DIR}/readarr:/config
-      - ${MEDIA_PATH}:/data # location of media and qbittorrent download folder
-    security_opt:
-     - no-new-privileges:true
-    ports:
-      - 8787:8787/tcp # web ui
-    healthcheck:
-      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8787/readarr/ping" ]
-      interval: 30s
-      retries: 10
-    restart: unless-stopped
+    networks:
+      - arr 
  
 
   flaresolverr:
@@ -121,6 +107,8 @@ services:
       - TZ=Europe/Berlin
     ports:
       - 8191:8191
+    networks:
+      - arr
 
 
   # image used for vpn killswitch network
@@ -133,6 +121,7 @@ services:
       - 8088:8088 # qbittorrent http web ui
       - 5030:5030 # soulseek web ui
       - 5031:5031 # soulseek https web ui
+      - 9696:9696 # prowlarr web ui
     healthcheck:
       test: ping -c 1 www.google.com || exit 1
       interval: 30s
@@ -151,12 +140,16 @@ services:
       - LISTENING_ADDRESS=0.0.0.0
       - VPN_INPUT_PORTS=8080,63758
       - VPN_PORT_FORWARDING_UP_COMMAND=/bin/sh -c 'wget -O- --retry-connrefused --post-data "json={\"listen_port\":{{PORTS}}}" http://127.0.0.1:8088/api/v2/app/setPreferences 2>&1'
+      - DNS_ADDRESS=127.0.0.11
       #- IPV6_ENABLED=false
     volumes:
       - ${CONFIG_DIR}/gluetun:/gluetun
     security_opt:
      - no-new-privileges:true
     restart: unless-stopped
+    networks:
+      - arr
+      - default
 
 
   # image used to download stuff; run over gluetun network (vpn killswitch)
@@ -200,6 +193,8 @@ services:
     volumes:
       - ${CONFIG_DIR}/overseerr:/app/config
     restart: unless-stopped
+    networks:
+      - arr 
 
 
 
@@ -217,6 +212,8 @@ services:
     ports:
       - 6767:6767
     restart: unless-stopped
+    networks:
+      - arr
 
 
   whisparr:
@@ -233,6 +230,8 @@ services:
       - ${MEDIA_PATH}:/data
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
+    networks:
+      - arr
 
   mamapi:
     image: elforkhead/mamapi:latest
