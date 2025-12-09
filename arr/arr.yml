@@ -29,6 +29,9 @@ services:
   sonarr:
     image: linuxserver/sonarr:latest
     container_name: sonarr
+    depends_on:
+      gluetun:
+        condition: service_healthy
     environment:
       - PUID=1000
       - PGID=1000
@@ -38,8 +41,6 @@ services:
       - ${MEDIA_PATH}:/data # location of media and qbittorrent download folder
     security_opt:
        - no-new-privileges:true 
-    ports:
-      - 8989:8989/tcp # web ui
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8989/sonarr/ping" ]
       interval: 30s
@@ -52,6 +53,9 @@ services:
   radarr:
     image: linuxserver/radarr:latest
     container_name: radarr
+    depends_on:
+      gluetun:
+        condition: service_healthy
     environment:
       - PUID=1000
       - PGID=1000
@@ -61,8 +65,6 @@ services:
       - ${MEDIA_PATH}:/data # location of media and qbittorrent download folder
     security_opt:
      - no-new-privileges:true 
-    ports:
-      - 7878:7878/tcp # web ui
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:7878/radarr/ping" ]
       interval: 30s
@@ -74,7 +76,10 @@ services:
 
   lidarr:
     image: linuxserver/lidarr:latest
-    container_name: lidarr
+    container_name: lidarr    
+    depends_on:
+      gluetun:
+        condition: service_healthy
     environment:
       - PUID=1000
       - PGID=1000
@@ -85,14 +90,10 @@ services:
       - ${TORRENT_PATH}:/downloads
     security_opt:
      - no-new-privileges:true 
-    expose:
-      - 8686/tcp # web ui
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8686/lidarr/ping" ]
       interval: 30s
       retries: 10
-    ports:
-      - 8686:8686/tcp # web ui
     restart: unless-stopped
     networks:
       - arr 
@@ -101,6 +102,9 @@ services:
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
     container_name: flaresolverr
+    depends_on:
+      gluetun:
+        condition: service_healthy
     restart: always
     environment:
       - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
@@ -172,7 +176,6 @@ services:
     env_file:
       - ./.env
       - ./qbittorrent.env
-
     depends_on:
       gluetun:
         condition: service_healthy
@@ -182,12 +185,13 @@ services:
   overseerr:
     image: sctx/overseerr:latest
     container_name: overseerr
+    depends_on:
+      gluetun:
+        condition: service_healthy
     environment:
       - LOG_LEVEL=debug
       - TZ=Europe/Berlin
       - PORT=5055 #optional
-    ports:
-      - 5055:5055
     security_opt:
      - no-new-privileges:true
     volumes:
@@ -201,6 +205,9 @@ services:
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest
     container_name: bazarr
+    depends_on:
+      gluetun:
+        condition: service_healthy
     environment:
       - PUID=1000
       - PGID=1000
@@ -209,8 +216,6 @@ services:
       - ${CONFIG_DIR}/bazarr:/config
       - ${MEDIA_PATH}/movies:/movies #optional
       - ${MEDIA_PATH}/tv:/tv #optional
-    ports:
-      - 6767:6767
     restart: unless-stopped
     networks:
       - arr
@@ -219,8 +224,9 @@ services:
   whisparr:
     container_name: whisparr
     image: ghcr.io/hotio/whisparr:v3-3.0.0.1124
-    ports:
-      - "6969:6969"
+    depends_on:
+      gluetun:
+        condition: service_healthy
     environment:
       - PUID=1000
       - PGID=1000
@@ -235,8 +241,10 @@ services:
 
   mamapi:
     image: elforkhead/mamapi:latest
-    # also available at ghcr.io/elforkhead/mamapi:latest
     container_name: mam_api
+    depends_on:
+      gluetun:
+        condition: service_healthy
     restart: unless-stopped
     network_mode: "service:gluetun"
     volumes:
