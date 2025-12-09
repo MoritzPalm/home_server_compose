@@ -301,5 +301,17 @@ services:
     volumes:
       - ${TORRENT_PATH}/complete:/downloads
       - ${CONFIG_DIR}/soularr:/data
+
+
+  profilarr:
+    image: santiagesayshey/profilarr:latest
+    container_name: profilarr
+    ports:
+      - 6868:6868
+    volumes:
+      - ${CONFIG_DIR}/profilarr:/config
+    environment:
+      - TZ=Europe/Berlin
+    restart: unless-stopped
    
 
