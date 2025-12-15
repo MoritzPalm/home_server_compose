@@ -40,7 +40,7 @@ services:
       - TZ=Europe/Berlin
     volumes:
       - ${CONFIG_DIR}/sonarr:/config # database and Radarr configs
-      - ${MEDIA_PATH}:/data # location of media and qbittorrent download folder
+      - ${STORAGE_DIR}:/data # location of media and qbittorrent download folder
     security_opt:
        - no-new-privileges:true 
     healthcheck:
@@ -67,7 +67,7 @@ services:
       - TZ=Europe/Berlin
     volumes:
       - ${CONFIG_DIR}/radarr:/config
-      - ${MEDIA_PATH}:/data # location of media and qbittorrent download folder
+      - ${STORARE_DIR}:/data # location of media and qbittorrent download folder
     security_opt:
      - no-new-privileges:true 
     healthcheck:
@@ -313,5 +313,8 @@ services:
     environment:
       - TZ=Europe/Berlin
     restart: unless-stopped
+    networks:
+      - arr
+      - default
    
 
