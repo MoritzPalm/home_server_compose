@@ -12,4 +12,5 @@ services:
       - ${TORRENT_PATH}:/downloads
     ports:
       - 8337:8337
+    env_file: ".env"
     restart: unless-stopped
