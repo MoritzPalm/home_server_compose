@@ -16,7 +16,7 @@ services:
       - "8889:8889"      # Tidal OAuth callback
     volumes:
       # Persistent data volumes
-      - ${CONFIG_DIR}:/app/config
+      - ${CONFIG_DIR}/soulsync:/app/config
       - ${LOG_DIR}/logs:/app/logs
       - ${TORRENT_DIR}/downloads:/app/downloads
       # Use named volume for database persistence (separate from host database)
@@ -25,9 +25,9 @@ services:
       # If your download/transfer paths are on E: drive, mount E: drive:
       - ${STORAGE_DIR}:/host/mnt/e:rw
       # Mount H: drive for transfer folder
-      - /mnt/h:/host/mnt/h:rw
+      #- /mnt/h:/host/mnt/h:rw
       # Optional: Mount your music library for Plex/Jellyfin access
-      - ${MEDIA_DIR}/music:ro
+      - ${MEDIA_DIR}:/music:ro
     extra_hosts:
       # Allow container to reach host services
       - "host.docker.internal:host-gateway"
