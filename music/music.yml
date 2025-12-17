@@ -7,9 +7,9 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
     volumes:
-      - ${CONFIG_PATH}/beets:/config
-      - ${MEDIA_PATH}:/music
-      - ${TORRENT_PATH}:/downloads
+      - ${CONFIG_DIR}/beets:/config
+      - ${MEDIA_DIR}:/music
+      - ${TORRENT_DIR}:/downloads
     ports:
       - 8337:8337
     env_file: ".env"
