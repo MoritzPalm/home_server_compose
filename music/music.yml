@@ -1,16 +1,58 @@
 services:
-  beets:
-    image: lscr.io/linuxserver/beets:latest
-    container_name: beets
+  soulsync:
+    image: boulderbadgedad/soulsync:latest
+    container_name: soulsync
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=Etc/UTC
-    volumes:
-      - ${CONFIG_DIR}/beets:/config
-      - ${MEDIA_DIR}:/music
-      - ${TORRENT_DIR}:/downloads
+      - FLASK_ENV=production
+      - PYTHONPATH=/app
+      - SOULSYNC_CONFIG_PATH=/app/config/config.json
+      # Set timezone
+      - TZ=Europe/Berlin
     ports:
-      - 8337:8337
-    env_file: ".env"
+      - "8008:8008"      # Main web app
+      - "8888:8888"      # Spotify OAuth callback
+      - "8889:8889"      # Tidal OAuth callback
+    volumes:
+      # Persistent data volumes
+      - ${CONFIG_DIR}:/app/config
+      - ${LOG_DIR}/logs:/app/logs
+      - ${TORRENT_DIR}/downloads:/app/downloads
+      # Use named volume for database persistence (separate from host database)
+      - soulsync_database:/app/database
+      # IMPORTANT: Mount the drives containing your download and transfer folders
+      # If your download/transfer paths are on E: drive, mount E: drive:
+      - ${STORAGE_DIR}:/host/mnt/e:rw
+      # Mount H: drive for transfer folder
+      - /mnt/h:/host/mnt/h:rw
+      # Optional: Mount your music library for Plex/Jellyfin access
+      - ${MEDIA_DIR}/music:ro
+    extra_hosts:
+      # Allow container to reach host services
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    # Resource limits (adjust as needed)
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+# Named volumes for persistent data
+volumes:
+  soulsync_database:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATABASE_DIR}/soulsync
