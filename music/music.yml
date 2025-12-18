@@ -1,4 +1,4 @@
-services:
+s4*KZpkWbNQiWCJ4qDDWEervices:
   soulsync:
     image: boulderbadgedad/soulsync:latest
     container_name: soulsync
@@ -10,6 +10,9 @@ services:
       - SOULSYNC_CONFIG_PATH=/app/config/config.json
       # Set timezone
       - TZ=Europe/Berlin
+    networks:
+      - default
+      - media_network
     ports:
       - "8008:8008"      # Main web app
       - "8888:8888"      # Spotify OAuth callback
@@ -56,3 +59,7 @@ volumes:
       type: none
       o: bind
       device: ${DATABASE_DIR}/soulsync
+
+networks:
+  media_network:
+    external: true
