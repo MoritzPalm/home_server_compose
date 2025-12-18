@@ -51,6 +51,23 @@ services:
           cpus: '0.5'
           memory: 512M
 
+
+  slskd:
+    image: slskd/slskd:latest
+    container_name: slskd
+    user: 1000:1000
+    volumes:
+      - ${CONFIG_DIR}/slskd:/app
+      - ${MEDIA_PATH}/music:/music:rw
+      - ${MEDIA_PATH}/books:/ebooks:rw
+      - ${TORRENT_PATH}:/downlyoads:rw
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    network_mode: service:gluetun # use the gluetun container network (vpn killswitch)
+
+
+
 # Named volumes for persistent data
 volumes:
   soulsync_database:
