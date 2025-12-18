@@ -280,7 +280,7 @@ services:
       - ${CONFIG_DIR}/slskd:/app
       - ${MEDIA_PATH}/music:/music:rw
       - ${MEDIA_PATH}/books:/ebooks:rw
-      - ${TORRENT_PATH}:/downloads:rw
+      - ${TORRENT_PATH}/downloads:/downloads:rw
     depends_on:
       gluetun:
         condition: service_healthy
