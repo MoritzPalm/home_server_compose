@@ -1,4 +1,4 @@
-s4*KZpkWbNQiWCJ4qDDWEervices:
+services:
   soulsync:
     image: boulderbadgedad/soulsync:latest
     container_name: soulsync
