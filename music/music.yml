@@ -27,13 +27,13 @@ services:
       # Mount H: drive for transfer folder
       #- /mnt/h:/host/mnt/h:rw
       # Optional: Mount your music library for Plex/Jellyfin access
-      - ${MEDIA_DIR}:/music:ro
+      - ${MEDIA_DIR}:/music:rw
     extra_hosts:
       # Allow container to reach host services
       - "host.docker.internal:host-gateway"
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8888/"]
+      test: ["CMD", "curl", "-f", "http://localhost:8008/"]
       interval: 30s
       timeout: 10s
       retries: 3
