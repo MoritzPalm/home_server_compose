@@ -11,6 +11,8 @@ services:
   immich-server:
     container_name: immich_server
     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
+    security_opt:
+      - no-new-privileges:true
     # extends:
     #   file: hwaccel.transcoding.yml
     #   service: cpu # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
@@ -43,6 +45,8 @@ services:
 
   immich-machine-learning:
     container_name: immich_machine_learning
+    security_opt:
+      - no-new-privileges:true
     # For hardware acceleration, add one of -[armnn, cuda, rocm, openvino, rknn] to the image tag.
     # Example tag: ${IMMICH_VERSION:-release}-cuda
     image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
@@ -62,6 +66,8 @@ services:
   redis:
     container_name: immich_redis
     image: docker.io/valkey/valkey:8-bookworm@sha256:42cba146593a5ea9a622002c1b7cba5da7be248650cbb64ecb9c6c33d29794b1
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test: redis-cli ping || exit 1
     restart: always
@@ -71,6 +77,8 @@ services:
   database:
     container_name: immich_postgres
     image: docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0@sha256:739cdd626151ff1f796dc95a6591b55a714f341c737e27f045019ceabf8e8c52
+    security_opt:
+      - no-new-privileges:true
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_USER: ${DB_USERNAME}

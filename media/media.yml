@@ -4,11 +4,13 @@ services:
     container_name: plex
     image: 'plexinc/pms-docker:latest'
     restart: always
+    security_opt:
+      - no-new-privileges:true
     environment:
       - TZ=Europe/Berlin
       - VERSION=docker
       - HOSTNAME="PLEX_SERVER"
-      - PLEX_CLAIM=claim-n3RF9y2y2jn6_pcRV-SQ
+      - PLEX_CLAIM=${PLEX_CLAIM_TOKEN}
     ports:
        - 32401:32400/tcp
        - 32401:32400/udp

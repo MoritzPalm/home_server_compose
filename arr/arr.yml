@@ -107,6 +107,8 @@ services:
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
     container_name: flaresolverr
+    security_opt:
+      - no-new-privileges:true
     depends_on:
       gluetun:
         condition: service_healthy
@@ -167,6 +169,8 @@ services:
   qbittorrent:
     image: linuxserver/qbittorrent:latest
     container_name: qbittorrent
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       # Container may fail if the vpn's token expired, so mark as unhealthy when there is no internet connection
       # see: https://github.com/qdm12/gluetun/issues/641#issuecomment-933856220
@@ -215,6 +219,8 @@ services:
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest
     container_name: bazarr
+    security_opt:
+      - no-new-privileges:true
     depends_on:
       gluetun:
         condition: service_healthy
@@ -237,6 +243,8 @@ services:
   whisparr:
     container_name: whisparr
     image: ghcr.io/hotio/whisparr:v3-3.0.0.1124
+    security_opt:
+      - no-new-privileges:true
     depends_on:
       gluetun:
         condition: service_healthy
@@ -258,6 +266,8 @@ services:
   mamapi:
     image: elforkhead/mamapi:latest
     container_name: mam_api
+    security_opt:
+      - no-new-privileges:true
     depends_on:
       gluetun:
         condition: service_healthy
@@ -276,6 +286,8 @@ services:
     image: slskd/slskd:latest
     container_name: slskd
     user: 1000:1000
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - ${CONFIG_DIR}/slskd:/app
       - ${MEDIA_PATH}/music:/music:rw
@@ -290,6 +302,8 @@ services:
   profilarr:
     image: santiagosayshey/profilarr:latest
     container_name: profilarr
+    security_opt:
+      - no-new-privileges:true
     ports:
       - 6868:6868
     volumes:

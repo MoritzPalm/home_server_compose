@@ -24,6 +24,8 @@ services:
       - '--web.console.templates=/usr/share/prometheus/consoles'
       - '--web.enable-lifecycle'
       - '--web.enable-admin-api'
+    security_opt:
+      - no-new-privileges:true
     ports:
       - 9090:9090
     depends_on:
@@ -45,6 +47,8 @@ services:
       - '--path.rootfs=/rootfs'
       #- --collector.filesystem.ignored-mount-points
       #- "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
+    security_opt:
+      - no-new-privileges:true
     ports:
       - 9100:9100
     networks:
@@ -58,6 +62,8 @@ services:
     volumes:
       - $CONFIG_PATH/alertmanager/:/etc/alertmanager/
     container_name: alertmanager
+    security_opt:
+      - no-new-privileges:true
     networks:
       - monitoring
     command:
@@ -72,6 +78,8 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
     container_name: cadvisor
+    security_opt:
+      - no-new-privileges:true
     ports:
       - 8082:8080
     networks:
@@ -91,8 +99,8 @@ services:
       - $CONFIG_PATH/grafana/provisioning/:/etc/grafana/provisioning/
     container_name: grafana
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=grafana
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
     networks:
       - monitoring
       - external
@@ -119,7 +127,11 @@ services:
   smartctl-exporter:
     image: matusnovak/prometheus-smartctl:latest
     container_name: smartctl-exporter
+    # WARNING: privileged mode is a security risk - consider running on host instead
+    # or use specific capabilities: cap_add: [SYS_RAWIO, SYS_ADMIN] with device bindings
     privileged: true
+    security_opt:
+      - no-new-privileges:true
     ports:
       - "9902:9902"
     restart: unless-stopped
@@ -128,6 +140,8 @@ services:
 
   watchtower:
     image: containrrr/watchtower
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/localtime:/etc/localtime:ro

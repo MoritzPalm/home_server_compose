@@ -3,6 +3,8 @@ services:
   broker:
     image: docker.io/library/redis:7
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - redisdata:/data
     networks:
@@ -11,6 +13,8 @@ services:
   db:
     image: docker.io/library/postgres:16
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - pgdata:/var/lib/postgresql/data
     environment:
@@ -68,6 +72,8 @@ services:
   gotenberg:
     image: docker.io/gotenberg/gotenberg:7.10
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
 
     # The gotenberg chromium route is used to convert .eml files. We do not
     # want to allow external content like tracking pixels or even javascript.
@@ -81,6 +87,8 @@ services:
   tika:
     image: docker.io/apache/tika:latest
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     networks:
       - paperless
 

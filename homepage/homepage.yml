@@ -5,6 +5,8 @@ services:
    homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
+    security_opt:
+      - no-new-privileges:true
     environment:
       - HOMEPAGE_VAR_TITLE=MServer
       - HOMEPAGE_VAR_SEARCH_PROVIDER=google
@@ -18,7 +20,7 @@ services:
       - HOMEPAGE_ALLOWED_HOSTS=moritzpalm.com
     volumes:
       - $CONFIG_PATH:/app/config
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro  # Read-only for security
       - ./data:/data
     restart: always
     #command: [sh, -c, "cp -n /app/config/tpl/*.yaml /app/config && node server.js"]

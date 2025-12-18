@@ -2,6 +2,8 @@ services:
   soulsync:
     image: boulderbadgedad/soulsync:latest
     container_name: soulsync
+    security_opt:
+      - no-new-privileges:true
     environment:
       - PUID=1000
       - PGID=1000

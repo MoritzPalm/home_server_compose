@@ -1,0 +1,66 @@
+# Environment and Configuration Files
+.env
+*.env
+!.env.example
+*.env.local
+*.env.production
+*.env.development
+
+# Secrets and Credentials
+**/secrets/
+**/credentials/
+**/*password*.txt
+**/*secret*.txt
+**/*key*.pem
+**/*key*.key
+*.pem
+*.key
+
+# Data Directories
+**/data/
+**/config/
+**/mediafiles/
+**/postgresql/
+**/staticfiles/
+
+# Logs
+**/logs/
+*.log
+
+# Temporary Files
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# IDE and Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# Docker Volumes and Build Artifacts
+docker-compose.override.yml
+.docker/
+
+# Backup Files
+*.backup
+*.bak
+*.old
+
+# OS Generated Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# Personal Notes (optional - uncomment if you keep notes)
+# notes.md
+# TODO.md
