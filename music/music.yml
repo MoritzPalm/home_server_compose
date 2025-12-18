@@ -20,8 +20,8 @@ services:
     volumes:
       - ${CONFIG_DIR}/soulsync:/app/config
       - ${LOG_DIR}/soulsync:/app/logs
-      - ${TORRENT_PATH}:/downloads:rw
-      - ${MEDIA_PATH}:/data/media:rw
+      - ${TORRENT_DIR}:/downloads:rw
+      - ${MEDIA_DIR}:/data/media:rw
       - soulsync_database:/app/database
     restart: unless-stopped
     healthcheck:
