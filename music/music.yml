@@ -7,7 +7,7 @@ services:
       - PGID=1000
       - FLASK_ENV=production
       - PYTHONPATH=/app
-      - SOULSYNC_CONFIG_PATH=/config/config.json
+      - SOULSYNC_CONFIG_PATH=/app/config/config.json
       # Set timezone
       - TZ=Europe/Berlin
     ports:
@@ -16,7 +16,7 @@ services:
       - "8889:8889"      # Tidal OAuth callback
     volumes:
       # Persistent data volumes
-      - ${CONFIG_DIR}/soulsync:/config
+      - ${CONFIG_DIR}/soulsync:/app/config
       - ${LOG_DIR}/soulsync:/app/logs
       - ${TORRENT_DIR}/downloads:/app/downloads
       # Use named volume for database persistence (separate from host database)
