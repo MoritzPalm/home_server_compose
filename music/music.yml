@@ -18,22 +18,11 @@ services:
       - "8888:8888"      # Spotify OAuth callback
       - "8889:8889"      # Tidal OAuth callback
     volumes:
-      # Persistent data volumes
       - ${CONFIG_DIR}/soulsync:/app/config
       - ${LOG_DIR}/soulsync:/app/logs
-      - ${TORRENT_DIR}/downloads:/app/downloads
-      # Use named volume for database persistence (separate from host database)
+      - ${TORRENT_PATH}:/downloads:rw
+      - ${MEDIA_PATH}:/data/media:rw
       - soulsync_database:/app/database
-      # IMPORTANT: Mount the drives containing your download and transfer folders
-      # If your download/transfer paths are on E: drive, mount E: drive:
-      - ${STORAGE_DIR}:/host/mnt/e:rw
-      # Mount H: drive for transfer folder
-      #- /mnt/h:/host/mnt/h:rw
-      # Optional: Mount your music library for Plex/Jellyfin access
-      - ${MEDIA_DIR}/music:/app/Transfer:rw
-    extra_hosts:
-      # Allow container to reach host services
-      - "host.docker.internal:host-gateway"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8008/"]
