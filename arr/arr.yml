@@ -132,7 +132,6 @@ services:
       gluetun:
         condition: service_healthy
     restart: always
-    read_only: true
     tmpfs:
       - /tmp
       - /run
@@ -241,6 +240,10 @@ services:
      - no-new-privileges:true
     cap_drop:
       - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
     volumes:
       - ${CONFIG_DIR}/overseerr:/app/config
     restart: unless-stopped
@@ -301,6 +304,10 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
 
   mamapi:
     image: elforkhead/mamapi:latest
@@ -358,6 +365,10 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
 
   bookshelf:
     image: ghcr.io/pennydreadful/bookshelf:hardcover
