@@ -310,7 +310,7 @@ services:
     volumes:
       - ${CONFIG_DIR}/bookshelf:/config
     security_opt:
-      - no-new-privilegs: true
+      - no-new-privilegs:true
     restart: unless-stopped
     networks:
       - default
