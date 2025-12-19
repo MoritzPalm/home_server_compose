@@ -337,7 +337,7 @@ services:
 
   mamapi:
     image: elforkhead/mamapi:latest
-    container_name: mam_api
+    container_name: mamapi
     depends_on:
       gluetun:
         condition: service_healthy
@@ -390,6 +390,7 @@ services:
   profilarr:
     image: santiagosayshey/profilarr:latest
     container_name: profilarr
+    user: "1000:1000"
     ports:
       - 6868:6868
     volumes:
@@ -424,6 +425,7 @@ services:
       - 8787:8787
     volumes:
       - ${CONFIG_DIR}/bookshelf:/config
+      - ${MEDIA_PATH}/books:/data/media/books
     security_opt:
        - no-new-privileges:true 
     cap_drop:
