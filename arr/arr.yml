@@ -238,12 +238,6 @@ services:
       - PORT=5055 #optional
     security_opt:
      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    cap_add:
-      - CHOWN
-      - SETUID
-      - SETGID
     volumes:
       - ${CONFIG_DIR}/overseerr:/app/config
     restart: unless-stopped
