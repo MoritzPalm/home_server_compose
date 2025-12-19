@@ -16,6 +16,8 @@ services:
       - ${CONFIG_DIR}/prowlarr:/config # database and Prowlarr configs
     security_opt:
       - no-new-privileges:true 
+    cap_drop:
+      - ALL
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:9696/prowlarr/ping" ]
       interval: 30s
@@ -39,6 +41,8 @@ services:
       - ${STORAGE_DIR}:/data # location of media and qbittorrent download folder
     security_opt:
        - no-new-privileges:true 
+    cap_drop:
+      - ALL
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8989/sonarr/ping" ]
       interval: 30s
@@ -46,7 +50,6 @@ services:
     restart: unless-stopped
     networks:
       - arr
-      - default
 
  
   radarr:
@@ -65,7 +68,9 @@ services:
       - ${CONFIG_DIR}/radarr:/config
       - ${STORAGE_DIR}:/data # location of media and qbittorrent download folder
     security_opt:
-     - no-new-privileges:true 
+     - no-new-privileges:true
+    cap_drop:
+      - ALL
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:7878/radarr/ping" ]
       interval: 30s
@@ -73,7 +78,6 @@ services:
     restart: unless-stopped
     networks:
       - arr
-      - default
 
 
   lidarr:
@@ -93,7 +97,9 @@ services:
       - ${MEDIA_PATH}:/data # location of media and qbittorrent download folder
       - ${TORRENT_PATH}:/downloads
     security_opt:
-     - no-new-privileges:true 
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8686/lidarr/ping" ]
       interval: 30s
@@ -101,7 +107,6 @@ services:
     restart: unless-stopped
     networks:
       - arr
-      - default
  
 
   flaresolverr:
@@ -111,21 +116,28 @@ services:
       gluetun:
         condition: service_healthy
     restart: always
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
     environment:
       - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
       - TZ=Europe/Berlin
     ports:
       - 8191:8191
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
     networks:
       - arr
-      - default
 
 
   # image used for vpn killswitch network
   gluetun:
     image: qmcgaw/gluetun:latest
     container_name: gluetun
-    cap_add:
+    cap_add: # docker drops all cap execpt added 
       - NET_ADMIN
     ports:
       - 8088:8088 # qbittorrent http web ui
@@ -188,6 +200,10 @@ services:
         condition: service_healthy
     network_mode: service:gluetun # use the gluetun container network (vpn killswitch)
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
 
   overseerr:
     image: sctx/overseerr:latest
@@ -203,12 +219,13 @@ services:
       - PORT=5055 #optional
     security_opt:
      - no-new-privileges:true
+    cap_drop:
+      - ALL
     volumes:
       - ${CONFIG_DIR}/overseerr:/app/config
     restart: unless-stopped
     networks:
       - arr
-      - default
 
 
 
@@ -231,7 +248,10 @@ services:
     restart: unless-stopped
     networks:
       - arr
-      - default
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
 
 
   whisparr:
@@ -253,7 +273,10 @@ services:
       - "com.centurylinklabs.watchtower.enable=false"
     networks:
       - arr
-      - default
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
 
   mamapi:
     image: elforkhead/mamapi:latest
@@ -270,6 +293,10 @@ services:
       MAM_ID: ${MAM_SESSION_ID}
       WRITE_CURRENT_MAMID: True
       SHUTDOWN_ON_DISCONNECT: True
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
 
 
   slskd:
@@ -285,6 +312,10 @@ services:
       gluetun:
         condition: service_healthy
     network_mode: service:gluetun # use the gluetun container network (vpn killswitch)
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
 
 
   profilarr:
@@ -299,7 +330,10 @@ services:
     restart: unless-stopped
     networks:
       - arr
-      - default
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
 
   bookshelf:
     image: ghcr.io/pennydreadful/bookshelf:hardcover
@@ -313,9 +347,10 @@ services:
       - ${CONFIG_DIR}/bookshelf:/config
     security_opt:
        - no-new-privileges:true 
+    cap_drop:
+      - ALL
     restart: unless-stopped
     networks:
-      - default
       - arr
 
    
