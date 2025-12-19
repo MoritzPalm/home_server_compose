@@ -227,6 +227,7 @@ services:
   overseerr:
     image: sctx/overseerr:latest
     container_name: overseerr
+    user: "1000:1000"
     depends_on:
       gluetun:
         condition: service_healthy
@@ -238,6 +239,8 @@ services:
       - PORT=5055 #optional
     security_opt:
      - no-new-privileges:true
+    cap_drop:
+      - ALL
     volumes:
       - ${CONFIG_DIR}/overseerr:/app/config
     restart: unless-stopped
