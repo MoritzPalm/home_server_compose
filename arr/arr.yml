@@ -18,6 +18,10 @@ services:
       - no-new-privileges:true 
     cap_drop:
       - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:9696/prowlarr/ping" ]
       interval: 30s
@@ -43,6 +47,10 @@ services:
        - no-new-privileges:true 
     cap_drop:
       - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8989/sonarr/ping" ]
       interval: 30s
@@ -71,6 +79,10 @@ services:
      - no-new-privileges:true
     cap_drop:
       - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:7878/radarr/ping" ]
       interval: 30s
@@ -100,6 +112,10 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
     healthcheck:
       test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8686/lidarr/ping" ]
       interval: 30s
@@ -204,6 +220,10 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
 
   overseerr:
     image: sctx/overseerr:latest
@@ -252,7 +272,11 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
-
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+  
 
   whisparr:
     container_name: whisparr
