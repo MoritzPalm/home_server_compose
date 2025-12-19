@@ -112,7 +112,7 @@ services:
       - TZ=Europe/Berlin
     volumes:
       - ${CONFIG_DIR}/lidarr:/config
-      - ${MEDIA_PATH}:/data # location of media and qbittorrent download folder
+      - ${STORAGE_DIR}:/data # location of media and qbittorrent download folder
       - ${TORRENT_PATH}:/downloads
     security_opt:
       - no-new-privileges:true
@@ -425,7 +425,7 @@ services:
       - 8787:8787
     volumes:
       - ${CONFIG_DIR}/bookshelf:/config
-      - ${MEDIA_PATH}/books:/data/media/books
+      - ${STORAGE_DIR}:/data
     security_opt:
        - no-new-privileges:true 
     cap_drop:
