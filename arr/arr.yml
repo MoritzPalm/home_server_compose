@@ -279,7 +279,7 @@ services:
       - TZ=Europe/Berlin
     volumes:
       - ${CONFIG_DIR}/bazarr:/config
-      - ${STORAGE_DIR}/media:/data
+      - ${STORAGE_DIR}:/data
     restart: unless-stopped
     networks:
       - arr
