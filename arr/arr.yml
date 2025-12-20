@@ -265,7 +265,6 @@ services:
       - arr
 
 
-
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest
     container_name: bazarr
@@ -280,8 +279,7 @@ services:
       - TZ=Europe/Berlin
     volumes:
       - ${CONFIG_DIR}/bazarr:/config
-      - ${MEDIA_PATH}/movies:/movies #optional
-      - ${MEDIA_PATH}/tv:/tv #optional
+      - ${STORAGE_DIR}:/data
     restart: unless-stopped
     networks:
       - arr
