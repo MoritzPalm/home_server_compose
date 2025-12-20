@@ -451,6 +451,10 @@ services:
       - ${CONFIG_DIR}/audiobookrequest:/config
     environment:
       - ABR_APP__DEFAULT_REGION=de
+      - ABR_APP__OPENAPI_ENABLED=true
+      - ABR_APP__INIT_ROOT_USERNAME=§{ABR_USERNAME}
+      - ABR_APP__INIT_ROOT_PASSWORD=${ABR_PASSWORD}
+      - ABR_APP__FORCE_LOGIN_TYPE=forms # to be changed when authentik is set up
       - TZ=Europe/Berlin
       - PUID=1000
       - PGID=1000
