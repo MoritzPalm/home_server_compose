@@ -442,6 +442,32 @@ services:
       retries: 3
       start_period: 30s
 
+  audiobookrequest:
+    image: markbeep/audiobookrequest:1
+    container_name: audiobookrequest
+    ports: 8000:8000
+    volumes: 
+      - ${CONFIG_DIR}/audiobookrequest:/config
+    environment:
+      - ABR_APP__DEFAULT_REGION=de
+      - TZ=Europe/Berlin
+      - PUID=1000
+      - PGID=1000
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    restart: unless-stopped
+    networks:
+      - arr
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://127.0.0.1:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+
    
 networks:
   arr:
