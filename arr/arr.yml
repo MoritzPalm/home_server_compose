@@ -445,7 +445,8 @@ services:
   audiobookrequest:
     image: markbeep/audiobookrequest:1
     container_name: audiobookrequest
-    ports: 8000:8000
+    ports: 
+      - 8000:8000
     volumes: 
       - ${CONFIG_DIR}/audiobookrequest:/config
     environment:
