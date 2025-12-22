@@ -1,22 +1,12 @@
-version: '3.7'
-
-volumes:
-    prometheus_data: {}
-    grafana_data: {}
-
-networks:
-  monitoring:
-  external:
-    external: true
-
 services:
 
   prometheus:
-    image: prom/prometheus:v2.36.2
-    volumes:
-      - $CONFIG_PATH/prometheus/:/etc/prometheus/
-      - prometheus_data:/prometheus
+    image: prom/prometheus:latest
     container_name: prometheus
+    user: "65534:65534" # nobody user
+    volumes:
+      - ${CONFIG_DIR}/prometheus/:/etc/prometheus/:ro
+      - ${DATABASE_DIR:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -25,132 +15,179 @@ services:
       - '--web.enable-lifecycle'
       - '--web.enable-admin-api'
     ports:
-      - 9090:9090
+      - 9090:9090{
     depends_on:
       - cadvisor
-#      - pushgateway
     networks:
       - monitoring
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
 
   node-exporter:
     image: quay.io/prometheus/node-exporter:latest
+    container_name: node-exporter
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro
-    container_name: node-exporter
     command: 
       - '--path.procfs=/host/proc' 
       - '--path.sysfs=/host/sys'
       - '--path.rootfs=/rootfs'
-      #- --collector.filesystem.ignored-mount-points
-      #- "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
     ports:
       - 9100:9100
     networks:
       - monitoring
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - SYS_TIME
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9100/metrics"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
 
 
   alertmanager:
-    image: prom/alertmanager
+    image: prom/alertmanager:latest
+    container_name: alertmanager
+    user: "65534:65534"
+    command:
+      - '--config.file=/etc/alertmanager/config.yml'
+      - '--storage.path=/alertmanager'
     ports:
       - 9093:9093
     volumes:
-      - $CONFIG_PATH/alertmanager/:/etc/alertmanager/
-    container_name: alertmanager
+      - ${CONFIG_PATH}/alertmanager:/etc/alertmanager:ro
     networks:
       - monitoring
-    command:
-      - '--config.file=/etc/alertmanager/config.yml'
-      - '--storage.path=/alertmanager'   
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9093/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:rw
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
+    image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
-    ports:
-      - 8082:8080
-    networks:
-      - monitoring
     command:
       - '--housekeeping_interval=55s'
       - '--docker_only'
-
+    ports:
+      - 8082:8080
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    devices:
+      - /dev/kmsg
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - SYS_ADMIN  # Required for container metrics
+    privileged: false
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - monitoring
+    
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:latest
+    container_name: grafana
+    user: "472:472"
     depends_on:
-      - prometheus
+      prometheus:
+        condition: service_healthy
     ports:
       - 3000:3000
     volumes:
-      - grafana_data:/var/lib/grafana
-      - $CONFIG_PATH/grafana/provisioning/:/etc/grafana/provisioning/
-    container_name: grafana
+      - ${DATABASE_DIR}/grafana:/var/lib/grafana
+      - ${CONFIG_PATH}/grafana/provisioning/:/etc/grafana/provisioning/:ro
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=grafana
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+      - GF_INSTALL_PLUGINS=
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
     networks:
       - monitoring
-      - external
-    user: "472"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.grafana.entrypoints=websecure"
-      - "traefik.http.routers.grafana.rule=Host(`grafana.moritzpalm.com`)"
-      - "traefik.http.routers.grafana.tls=true"
-      - "traefik.http.routers.grafana.tls.certresolver=cloudflare"
-      - "traefik.http.routers.grafana.service=grafana"
-      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
-      - homepage.group=Internals
-      - homepage.name=Grafana
-      - homepage.icon=grafana.png
-      - homepage.href=https://grafana.moritzpalm.com
-      - homepage.description=Server Metrics
-      - homepage.widget.type=grafana
-      - homepage.widget.url=http://grafana:3000
-      - homepage.widget.username=admin
-      - homepage.widget.password=grafana
-      - homepage.widget.fields=["dashboards", "datasources", "totalalerts", "alertstriggered"]
-
+    
   smartctl-exporter:
     image: matusnovak/prometheus-smartctl:latest
     container_name: smartctl-exporter
     privileged: true
     ports:
       - "9902:9902"
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9902/metrics"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     restart: unless-stopped
     networks:
       - monitoring
 
   watchtower:
-    image: containrrr/watchtower
+    image: containrrr/watchtower:latest
+    container_name: watchtower
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       - /etc/localtime:/etc/localtime:ro
     environment:
       - WATCHTOWER_NOTIFICATIONS_LEVEL=info
       - WATCHTOWER_NOTIFICATIONS=shoutrrr
-      - WATCHTOWER_NOTIFICATION_URL=discord://$DISCORD_TOKEN@$DISCORD_WEBHOOKID
+      - WATCHTOWER_NOTIFICATION_URL=discord://${WATCHTOWER_DISCORD_TOKEN}@${WATCHTOWER_DISCORD_WEBHOOKID}
       - WATCHTOWER_SCHEDULE=0 0 4 * * *
       - WATCHTOWER_CLEANUP=true
       - WATCHTOWER_TIMEOUT=30s
       - WATCHTOWER_INCLUDE_RESTARTING=true
-      #- WATCHTOWER_ROLLING_RESTART=true
+      - WATCHTOWER_ROLLING_RESTART=true
       - WATCHTOWER_INCLUDE_STOPPED=true
-      
+      - WATCHTOWER_REVIVE_STOPPED=false
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    restart: unless-stopped
 
-
-#  pushgateway:
-#    image: prom/pushgateway
-#    deploy:
-#      mode: global
-#      restart_policy:
-#        condition: on-failure
-#    ports:
-#      - 9091:9091
-#    networks:
-#      - monitor-net
