@@ -1,0 +1,24 @@
+services:
+  backend:
+    container_name: hevy_backend
+    image: casudo/hevy-insights-backend:latest
+    restart: unless-stopped
+    environment:
+      - X_API_KEY=klean_kanteen_insulated
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    hostname: hevy_backend
+
+  frontend:
+    container_name: hevy_frontend
+    image: Ycasudo/hevy-insights-frontend:latest
+    restart: unless-stopped
+    ports:
+      - 8123:8080
+    depends_on:
+      backend:
+        condition: service_healthy
+    hostname: hevy_frontend
