@@ -5,7 +5,7 @@ services:
     container_name: prometheus
     user: "65534:65534" # nobody user
     volumes:
-      - ${CONFIG_DIR}/prometheus/:/etc/prometheus/:ro
+      - ${CONFIG_DIR}/prometheus/:/etc/prometheus/:rw
       - ${DATABASE_DIR}:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
@@ -185,6 +185,17 @@ services:
       - WATCHTOWER_ROLLING_RESTART=true
       - WATCHTOWER_INCLUDE_STOPPED=true
       - WATCHTOWER_REVIVE_STOPPED=false
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    restart: unless-stopped
+
+  whatsupdocker:
+    image: getwud/wud
+    container_name: wud
+    volumes: 
+      - /var/run/docker.sock:/var/run/docker.sock
     security_opt:
       - no-new-privileges:true
     cap_drop:
