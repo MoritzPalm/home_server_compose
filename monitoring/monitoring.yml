@@ -191,3 +191,8 @@ services:
       - ALL
     restart: unless-stopped
 
+
+networks:
+  monitoring:
+    driver: bridge
+
