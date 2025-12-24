@@ -14,7 +14,7 @@ services:
 
   frontend:
     container_name: hevy_frontend
-    image: Ycasudo/hevy-insights-frontend:latest
+    image: casudo/hevy-insights-frontend:latest
     restart: unless-stopped
     ports:
       - 8123:8080
