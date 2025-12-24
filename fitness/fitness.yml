@@ -5,11 +5,6 @@ services:
     restart: unless-stopped
     environment:
       - X_API_KEY=klean_kanteen_insulated
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
     hostname: hevy_backend
 
   frontend:
