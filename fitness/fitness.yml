@@ -14,6 +14,5 @@ services:
     ports:
       - 8123:8080
     depends_on:
-      backend:
-        condition: service_healthy
+      - backend
     hostname: hevy_frontend
