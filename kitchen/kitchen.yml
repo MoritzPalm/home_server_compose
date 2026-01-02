@@ -28,9 +28,9 @@ services:
 
   web_recipes:
     image: vabene1111/recipes:latest
-    container_name: web_recipes
+    container_name: tandoor
+    ports: 9815:80
     environment:
-      # Database settings
       - DB_ENGINE=django.db.backends.postgresql
       - POSTGRES_HOST=db_recipes
       - POSTGRES_PORT=5432
@@ -38,18 +38,13 @@ services:
       - POSTGRES_USER=${RECIPES_DB_USER:-djangodb}
       - POSTGRES_PASSWORD=${RECIPES_DB_PASSWORD}
       
-      # Security
       - SECRET_KEY=${RECIPES_SECRET_KEY}
       - ALLOWED_HOSTS=${RECIPES_ALLOWED_HOSTS:-*}
       
-      # Gunicorn settings
       - GUNICORN_MEDIA=0  # Nginx serves media
-      
-      # Timezone
       - TZ=${TZ:-Europe/Berlin}
     volumes:
       - recipes_staticfiles:/opt/recipes/staticfiles
-      - recipes_nginx_config:/opt/recipes/nginx/conf.d
       - ${CONFIG_DIR}/recipes/mediafiles:/opt/recipes/mediafiles
     depends_on:
       db_recipes:
@@ -70,38 +65,7 @@ services:
       start_period: 60s  # Longer start period for migrations
     restart: unless-stopped
 
-  nginx_recipes:
-    image: nginx:mainline-alpine
-    container_name: nginx_recipes
-    user: "101:101"  # Nginx user in alpine image
-    ports:
-      - 8084:80  # Change port as needed
-    environment:
-      - TZ=${TZ:-Europe/Berlin}
-    volumes:
-      - recipes_nginx_config:/etc/nginx/conf.d:ro
-      - recipes_staticfiles:/static:ro
-      - ${CONFIG_DIR}/recipes/mediafiles:/media:ro
-    depends_on:
-      web_recipes:
-        condition: service_healthy
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    cap_add:
-      - CHOWN
-      - SETUID
-      - SETGID
-      - NET_BIND_SERVICE  # To bind to port 80
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-    restart: unless-stopped
-
+  
 volumes:
   recipes_nginx_config:
     driver: local
