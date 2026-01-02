@@ -1,58 +1,110 @@
-networks:
-  external:
-    external: true
-
 services:
   db_recipes:
-    restart: always
     image: postgres:16-alpine
+    container_name: db_recipes
+    user: "999:999"  # Postgres user in alpine image
+    environment:
+      - POSTGRES_DB=${RECIPES_DB_NAME:-recipes}
+      - POSTGRES_USER=${RECIPES_DB_USER:-djangodb}
+      - POSTGRES_PASSWORD=${RECIPES_DB_PASSWORD}
+      - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
-      - ./postgresql:/var/lib/postgresql/data
-    env_file:
-      - stack.env
-    networks:
-      - external
+      - ${DATABASE_DIR}/recipes/postgresql:/var/lib/postgresql/data
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+      - DAC_OVERRIDE  # Needed for postgres file operations
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${RECIPES_DB_USER:-djangodb}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
 
   web_recipes:
-    restart: always
-    image: vabene1111/recipes
-    env_file:
-      - stack.env
+    image: vabene1111/recipes:latest
+    container_name: web_recipes
+    environment:
+      # Database settings
+      - DB_ENGINE=django.db.backends.postgresql
+      - POSTGRES_HOST=db_recipes
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${RECIPES_DB_NAME:-recipes}
+      - POSTGRES_USER=${RECIPES_DB_USER:-djangodb}
+      - POSTGRES_PASSWORD=${RECIPES_DB_PASSWORD}
+      
+      # Security
+      - SECRET_KEY=${RECIPES_SECRET_KEY}
+      - ALLOWED_HOSTS=${RECIPES_ALLOWED_HOSTS:-*}
+      
+      # Gunicorn settings
+      - GUNICORN_MEDIA=0  # Nginx serves media
+      
+      # Timezone
+      - TIMEZONE=${TZ:-Europe/Berlin}
     volumes:
-      - staticfiles:/opt/recipes/staticfiles
-      # Do not make this a bind mount, see https://docs.tandoor.dev/install/docker/#volumes-vs-bind-mounts
-      - nginx_config:/opt/recipes/nginx/conf.d
-      - ./mediafiles:/opt/recipes/mediafiles
+      - recipes_staticfiles:/opt/recipes/staticfiles
+      - recipes_nginx_config:/opt/recipes/nginx/conf.d
+      - ${CONFIG_DIR}/recipes/mediafiles:/opt/recipes/mediafiles
     depends_on:
-      - db_recipes
-    networks:
-       - external
+      db_recipes:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s  # Longer start period for migrations
+    restart: unless-stopped
 
   nginx_recipes:
     image: nginx:mainline-alpine
-    restart: always
-    env_file:
-      - stack.env
-    depends_on:
-      - web_recipes
+    container_name: nginx_recipes
+    user: "101:101"  # Nginx user in alpine image
+    ports:
+      - 8084:80  # Change port as needed
+    environment:
+      - TZ=${TZ:-Europe/Berlin}
     volumes:
-      # Do not make this a bind mount, see https://docs.tandoor.dev/install/docker/#volumes-vs-bind-mounts
-      - nginx_config:/etc/nginx/conf.d:ro
-      - staticfiles:/static:ro
-      - ./mediafiles:/media:ro
-    networks:
-      - external
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.recipes.entrypoints=websecure"
-      - "traefik.http.routers.recipes.rule=Host(`recipes.moritzpalm.com`)"
-      - "traefik.http.routers.recipes.tls=true"
-      - "traefik.http.routers.recipes.tls.certresolver=cloudflare"
-      - "traefik.http.routers.recipes.service=recipes"
-      - "traefik.http.services.recipes.loadbalancer.server.port=80"
-      - "traefik.http.middlewares.recipes.headers.customrequestheaders.Host=recipes.moritzpalm.com"
-      - "traefik.http.middlewares.recipes.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - recipes_nginx_config:/etc/nginx/conf.d:ro
+      - recipes_staticfiles:/static:ro
+      - ${CONFIG_DIR}/recipes/mediafiles:/media:ro
+    depends_on:
+      web_recipes:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+      - NET_BIND_SERVICE  # To bind to port 80
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
 
 volumes:
-  nginx_config:
-  staticfiles:
+  recipes_nginx_config:
+    driver: local
+  recipes_staticfiles:
+    driver: local
