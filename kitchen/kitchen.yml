@@ -1,7 +1,7 @@
 services:
   db_recipes:
-    image: postgres:16-alpine
-    container_name: db_recipes
+    image: postgres:18-alpine
+    container_name: tandoor_db 
     environment:
       - POSTGRES_DB=${RECIPES_DB_NAME:-recipes}
       - POSTGRES_USER=${RECIPES_DB_USER:-djangodb}
@@ -48,7 +48,7 @@ services:
       - recipes_staticfiles:/opt/recipes/staticfiles
       - ${CONFIG_DIR}/recipes/mediafiles:/opt/recipes/mediafiles
     depends_on:
-      db_recipes:
+      tandoor_db:
         condition: service_healthy
     security_opt:
       - no-new-privileges:true
@@ -59,7 +59,7 @@ services:
       - SETUID
       - SETGID
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9815"]
       interval: 30s
       timeout: 10s
       retries: 3
