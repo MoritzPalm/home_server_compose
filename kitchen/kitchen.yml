@@ -2,7 +2,6 @@ services:
   db_recipes:
     image: postgres:16-alpine
     container_name: db_recipes
-    user: "999:999"  # Postgres user in alpine image
     environment:
       - POSTGRES_DB=${RECIPES_DB_NAME:-recipes}
       - POSTGRES_USER=${RECIPES_DB_USER:-djangodb}
@@ -18,7 +17,6 @@ services:
       - CHOWN
       - SETUID
       - SETGID
-      - DAC_OVERRIDE  # Needed for postgres file operations
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${RECIPES_DB_USER:-djangodb}"]
       interval: 30s
