@@ -1,12 +1,11 @@
 services:
-  db_recipes:
+  tandoor_db:
     image: postgres:18-alpine
     container_name: tandoor_db 
     environment:
       - POSTGRES_DB=${RECIPES_DB_NAME:-recipes}
       - POSTGRES_USER=${RECIPES_DB_USER:-djangodb}
       - POSTGRES_PASSWORD=${RECIPES_DB_PASSWORD}
-      - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - ${DATABASE_DIR}/recipes/postgresql:/var/lib/postgresql/data
     security_opt:
@@ -33,7 +32,7 @@ services:
       - 9815:80
     environment:
       - DB_ENGINE=django.db.backends.postgresql
-      - POSTGRES_HOST=db_recipes
+      - POSTGRES_HOST=tandoor_db
       - POSTGRES_PORT=5432
       - POSTGRES_DB=${RECIPES_DB_NAME:-recipes}
       - POSTGRES_USER=${RECIPES_DB_USER:-djangodb}
@@ -42,11 +41,10 @@ services:
       - SECRET_KEY=${RECIPES_SECRET_KEY}
       - ALLOWED_HOSTS=${RECIPES_ALLOWED_HOSTS:-*}
       
-      - GUNICORN_MEDIA=0  # Nginx serves media
       - TZ=${TZ:-Europe/Berlin}
     volumes:
       - recipes_staticfiles:/opt/recipes/staticfiles
-      - ${CONFIG_DIR}/recipes/mediafiles:/opt/recipes/mediafiles
+      - ${MEDIA_DIR}/recipes/mediafiles:/opt/recipes/mediafiles
     depends_on:
       tandoor_db:
         condition: service_healthy
@@ -59,7 +57,7 @@ services:
       - SETUID
       - SETGID
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9815"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -68,7 +66,5 @@ services:
 
   
 volumes:
-  recipes_nginx_config:
-    driver: local
   recipes_staticfiles:
     driver: local
