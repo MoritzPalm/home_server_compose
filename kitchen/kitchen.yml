@@ -18,7 +18,7 @@ services:
       - SETUID
       - SETGID
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${RECIPES_DB_USER:-djangodb}"]
+      test: ["CMD-SHELL", "pg_isready -U ${RECIPES_DB_USER:-djangodb} -d ${RECIPES_DB_NAME:-recipes}"]
       interval: 30s
       timeout: 10s
       retries: 3
