@@ -7,7 +7,7 @@ services:
       - POSTGRES_USER=${RECIPES_DB_USER:-djangodb}
       - POSTGRES_PASSWORD=${RECIPES_DB_PASSWORD}
     volumes:
-      - ${DATABASE_DIR}/recipes/postgresql:/var/lib/postgresql/data
+      - ${DATABASE_DIR}/recipes:/var/lib/postgresql/data
     security_opt:
       - no-new-privileges:true
     cap_drop:
