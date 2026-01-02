@@ -29,7 +29,8 @@ services:
   web_recipes:
     image: vabene1111/recipes:latest
     container_name: tandoor
-    ports: 9815:80
+    ports: 
+      - 9815:80
     environment:
       - DB_ENGINE=django.db.backends.postgresql
       - POSTGRES_HOST=db_recipes
