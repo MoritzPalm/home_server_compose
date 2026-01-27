@@ -9,6 +9,7 @@ services:
       - VERSION=docker
       - HOSTNAME="PLEX_SERVER"
       - PLEX_CLAIM=claim-n3RF9y2y2jn6_pcRV-SQ
+      - ADVERTISE_IP="http://192.168.178.35:32401/"
     ports:
        - 32401:32400/tcp
        - 32401:32400/udp
@@ -20,9 +21,7 @@ services:
        - 32412:32412/udp
        - 32413:32413/udp
        - 32414:32414/udp
-    networks:
-      - default
-      - media_network
+    network_mode: "host"
     devices:
       - "/dev/dri:/dev/dri" # Binds the Intel Quicksync decoder to Plex HW Transcode
 
@@ -31,12 +30,3 @@ services:
       - "/dev/shm:/transcode"
       - "${MEDIA_PATH}:/data/media"
 
-
-networks:
-  media_network:
-    external: true
-
-
-
-
-    
