@@ -388,12 +388,13 @@ services:
   profilarr:
     image: santiagosayshey/profilarr:latest
     container_name: profilarr
-    user: "1000:1000"
     ports:
       - 6868:6868
     volumes:
       - ${CONFIG_DIR}/profilarr:/config
     environment:
+      - PUID=1000
+      - PGID=1000
       - TZ=Europe/Berlin
     restart: unless-stopped
     networks:
