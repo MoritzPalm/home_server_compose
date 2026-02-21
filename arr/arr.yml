@@ -465,6 +465,7 @@ services:
       - CHOWN
       - SETUID
       - SETGID
+      - DAC_OVERRIDE
     restart: unless-stopped
     networks:
       - arr
