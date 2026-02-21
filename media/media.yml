@@ -21,7 +21,6 @@ services:
        - 32412:32412/udp
        - 32413:32413/udp
        - 32414:32414/udp
-       - [::]:32401:32400/tcp
     networks:
       - default
       - media_network
@@ -29,7 +28,7 @@ services:
       - "/dev/dri:/dev/dri" # Binds the Intel Quicksync decoder to Plex HW Transcode
 
     volumes:
-      - "${CONFIG_DIR}:/config"
+      - "${CONFIG_PATH}:/config"
       - "/dev/shm:/transcode"
       - "${MEDIA_PATH}:/data/media"
 

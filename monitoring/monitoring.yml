@@ -5,7 +5,7 @@ services:
     container_name: prometheus
     user: "65534:65534" # nobody user
     volumes:
-      - ${CONFIG_DIR}/prometheus:/etc/prometheus:ro
+      - ${CONFIG_PATH}/prometheus:/etc/prometheus:ro
       - ${DATABASE_DIR}/prometheus:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
@@ -83,7 +83,7 @@ services:
     ports:
       - 9093:9093
     volumes:
-      - ${CONFIG_DIR}/alertmanager:/etc/alertmanager:ro
+      - ${CONFIG_PATH}/alertmanager:/etc/alertmanager:ro
     networks:
       - monitoring
     security_opt:
@@ -141,7 +141,7 @@ services:
       - 3000:3000
     volumes:
       - ${DATABASE_DIR}/grafana:/var/lib/grafana
-      - ${CONFIG_DIR}/grafana/provisioning/:/etc/grafana/provisioning/:ro
+      - ${CONFIG_PATH}/grafana/provisioning/:/etc/grafana/provisioning/:ro
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}

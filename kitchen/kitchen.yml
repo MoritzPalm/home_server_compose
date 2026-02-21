@@ -46,7 +46,7 @@ services:
       - TZ=${TZ:-Europe/Berlin}
     volumes:
       - recipes_staticfiles:/opt/recipes/staticfiles
-      - ${MEDIA_DIR}/recipes/mediafiles:/opt/recipes/mediafiles
+      - ${MEDIA_PATH}/recipes/mediafiles:/opt/recipes/mediafiles
     depends_on:
       tandoor_db:
         condition: service_healthy
