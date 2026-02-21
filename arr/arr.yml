@@ -445,6 +445,7 @@ services:
   audiobookrequest:
     image: markbeep/audiobookrequest:1
     container_name: audiobookrequest
+    user: "1000:1000"
     ports: 
       - 8000:8000
     volumes: 
@@ -456,8 +457,6 @@ services:
       - ABR_APP__INIT_ROOT_PASSWORD=${ABR_PASSWORD}
       - ABR_APP__FORCE_LOGIN_TYPE=forms # to be changed when authentik is set up
       - TZ=Europe/Berlin
-      - PUID=1000
-      - PGID=1000
     security_opt:
       - no-new-privileges:true
     cap_drop:
