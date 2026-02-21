@@ -220,7 +220,6 @@ services:
       - ${STORAGE_DIR}:/data
     env_file:
       - ./.env
-      - ./qbittorrent.env
     depends_on:
       gluetun:
         condition: service_healthy
