@@ -371,7 +371,7 @@ services:
       - ${CONFIG_PATH}/slskd:/app
       - ${MEDIA_PATH}/music:/music:rw
       - ${MEDIA_PATH}/books:/ebooks:rw
-      - ${soulseek_path}:/downloads:rw
+      - ${SOULSEEK_PATH}:/downloads:rw
     depends_on:
       gluetun:
         condition: service_healthy
