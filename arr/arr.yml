@@ -113,7 +113,6 @@ services:
     volumes:
       - ${CONFIG_PATH}/lidarr:/config
       - ${STORAGE_DIR}:/data # location of media and qbittorrent download folder
-      - ${TORRENT_PATH}:/downloads
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -317,7 +316,7 @@ services:
       - TZ=Europe/Berlin
     volumes:
       - ${CONFIG_PATH}/whisparr:/config
-      - ${MEDIA_PATH}:/data
+      - ${STORAGE_DIR}:/data
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
     networks:
@@ -372,7 +371,7 @@ services:
       - ${CONFIG_PATH}/slskd:/app
       - ${MEDIA_PATH}/music:/music:rw
       - ${MEDIA_PATH}/books:/ebooks:rw
-      - ${TORRENT_PATH}/downloads:/downloads:rw
+      - ${soulseek_path}:/downloads:rw
     depends_on:
       gluetun:
         condition: service_healthy
