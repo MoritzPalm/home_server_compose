@@ -10,6 +10,9 @@ services:
       - HOSTNAME="PLEX_SERVER"
       - PLEX_CLAIM=claim-n3RF9y2y2jn6_pcRV-SQ
       - ADVERTISE_IP="http://192.168.178.35:32400/,http://130.185.16.42:32401/"
+    networks:
+      - default
+      - media_network
     ports:
        - 32401:32400/tcp
        - 32401:32400/udp
@@ -21,9 +24,6 @@ services:
        - 32412:32412/udp
        - 32413:32413/udp
        - 32414:32414/udp
-    networks:
-      - default
-      - media_network
     devices:
       - "/dev/dri:/dev/dri" # Binds the Intel Quicksync decoder to Plex HW Transcode
 
@@ -32,8 +32,48 @@ services:
       - "/dev/shm:/transcode"
       - "${MEDIA_PATH}:/data/media"
 
+  soulsync:
+    image: boulderbadgedad/soulsync:latest
+    container_name: soulsync
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - FLASK_ENV=production
+      - PYTHONPATH=/app
+      - SOULSYNC_CONFIG_PATH=/app/config/config.json
+      # Set timezone
+      - TZ=Europe/Berlin
+    networks:
+      - default
+      - media_network
+    ports:
+      - "8008:8008"      # Main web app
+      - "8888:8888"      # Spotify OAuth callback
+      - "8889:8889"      # Tidal OAuth callback
+    volumes:
+      - ${CONFIG_PATH}/soulsync:/app/config
+      - ${LOG_DIR}/soulsync:/app/logs
+      - ${TORRENT_PATH}/music:/downloads:rw
+      - ${MEDIA_PATH}:/data/media:rw
+      - soulsync_database:/app/database
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8008/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+
+volumes:
+  soulsync_database:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DATABASE_DIR}/soulsync
+
 
 networks:
   media_network:
     external: true
-
