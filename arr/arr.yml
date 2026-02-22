@@ -281,6 +281,8 @@ services:
       - ${CONFIG_PATH}/bazarr:/config
       - ${STORAGE_DIR}/media/movies:/movies
       - ${STORAGE_DIR}/media/tv:/tv
+    tmpfs:
+      - /run:uid=1000,gid=1000,exec
     restart: unless-stopped
     networks:
       - arr
