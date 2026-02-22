@@ -278,7 +278,7 @@ services:
       - TZ=Europe/Berlin
     volumes:
       - ${CONFIG_PATH}/bazarr:/config
-      - ${STORAGE_DIR}:/data
+      - ${STORAGE_DIR}/media:/data
     restart: unless-stopped
     networks:
       - arr
@@ -382,10 +382,6 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
-    cap_add:
-      - CHOWN
-      - SETGID
-      - SETUID
 
 
   profilarr:
