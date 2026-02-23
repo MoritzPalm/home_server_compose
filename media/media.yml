@@ -26,7 +26,6 @@ services:
        - 32414:32414/udp
     devices:
       - "/dev/dri:/dev/dri" # Binds the Intel Quicksync decoder to Plex HW Transcode
-
     volumes:
       - "${CONFIG_PATH}/plex:/config"
       - "/dev/shm:/transcode"
