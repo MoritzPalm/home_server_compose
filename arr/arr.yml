@@ -44,7 +44,7 @@ services:
       - TZ=Europe/Berlin
     volumes:
       - ${CONFIG_PATH}/sonarr:/config # database and Radarr configs
-      - ${STORAGE_DIR}:/data # location of media and qbittorrent download folder
+      - ${MEDIA_PATH}:/data # location of media and qbittorrent download folder
     security_opt:
        - no-new-privileges:true 
     cap_drop:
@@ -78,7 +78,7 @@ services:
       - TZ=Europe/Berlin
     volumes:
       - ${CONFIG_PATH}/radarr:/config
-      - ${STORAGE_DIR}:/data # location of media and qbittorrent download folder
+      - ${MEDIA_PATH}:/data # location of media and qbittorrent download folder
     security_opt:
      - no-new-privileges:true
     cap_drop:
@@ -112,7 +112,7 @@ services:
       - TZ=Europe/Berlin
     volumes:
       - ${CONFIG_PATH}/lidarr:/config
-      - ${STORAGE_DIR}:/data # location of media and qbittorrent download folder
+      - ${MEDIA_PATH}:/data # location of media and qbittorrent download folder
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -279,8 +279,8 @@ services:
       - TZ=Europe/Berlin
     volumes:
       - ${CONFIG_PATH}/bazarr:/config
-      - ${STORAGE_DIR}/media/movies:/movies
-      - ${STORAGE_DIR}/media/tv:/tv
+      - ${MEDIA_PATH}/movies:/movies
+      - ${MEDIA_PATH}/tv:/tv
     tmpfs:
       - /run:uid=1000,gid=1000,exec
     restart: unless-stopped
@@ -316,7 +316,7 @@ services:
       - TZ=Europe/Berlin
     volumes:
       - ${CONFIG_PATH}/whisparr:/config
-      - ${STORAGE_DIR}:/data
+      - ${MEDIA_PATH}:/data
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
     networks:
@@ -431,7 +431,7 @@ services:
       - 8787:8787
     volumes:
       - ${CONFIG_PATH}/bookshelf:/config
-      - ${STORAGE_DIR}:/data
+      - ${MEDIA_PATH}:/data
     security_opt:
        - no-new-privileges:true 
     cap_drop:
