@@ -78,7 +78,7 @@ services:
       - TZ=Europe/Berlin
     volumes:
       - ${CONFIG_PATH}/radarr:/config
-      - ${STORAGE_PATH}:/data/media # location of media and qbittorrent download folder
+      - ${STORAGE_PATH}:/data # location of media and qbittorrent download folder
     security_opt:
      - no-new-privileges:true
     cap_drop:
@@ -112,7 +112,7 @@ services:
       - TZ=Europe/Berlin
     volumes:
       - ${CONFIG_PATH}/lidarr:/config
-      - ${STORAGE_PATH}:/data/ # location of media and qbittorrent download folder
+      - ${STORAGE_PATH}:/data # location of media and qbittorrent download folder
     security_opt:
       - no-new-privileges:true
     cap_drop:
