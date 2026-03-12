@@ -54,7 +54,7 @@ services:
       - ${LOG_DIR}/soulsync:/app/logs
       - ${SOULSEEK_PATH}:/downloads:rw
       - ${MEDIA_PATH}:/data/media:rw
-      - soulsync_database:/app/database
+      - soulsync_database:/app/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8008/"]
