@@ -84,6 +84,7 @@ services:
       - 9093:9093
     volumes:
       - ${CONFIG_PATH}/alertmanager:/etc/alertmanager:ro
+      - ${DATABASE_DIR}/alertmanager:/alertmanager
     networks:
       - monitoring
     security_opt:
@@ -211,7 +212,7 @@ services:
     image: getwud/wud
     container_name: wud
     volumes: 
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     security_opt:
       - no-new-privileges:true
     cap_drop:

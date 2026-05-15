@@ -23,7 +23,7 @@ services:
       - SETUID
       - SETGID
     healthcheck:
-      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:9696/prowlarr/ping" ]
+      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:9696/ping" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -43,7 +43,7 @@ services:
       - PGID=1000
       - TZ=Europe/Berlin
     volumes:
-      - ${CONFIG_PATH}/sonarr:/config # database and Radarr configs
+      - ${CONFIG_PATH}/sonarr:/config # database and Sonarr configs
       - ${STORAGE_PATH}:/data # location of media and qbittorrent download folder
     security_opt:
        - no-new-privileges:true 
@@ -54,7 +54,7 @@ services:
       - SETUID
       - SETGID
     healthcheck:
-      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8989/sonarr/ping" ]
+      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8989/ping" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -88,7 +88,7 @@ services:
       - SETUID
       - SETGID
     healthcheck:
-      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:7878/radarr/ping" ]
+      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:7878/ping" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -122,7 +122,7 @@ services:
       - SETUID
       - SETGID
     healthcheck:
-      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8686/lidarr/ping" ]
+      test: [ "CMD", "curl", "--fail", "http://127.0.0.1:8686/ping" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -138,21 +138,18 @@ services:
     depends_on:
       gluetun:
         condition: service_healthy
-    restart: always
+    network_mode: service:gluetun
+    restart: unless-stopped
     tmpfs:
       - /tmp
       - /run
     environment:
       - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
       - TZ=Europe/Berlin
-    ports:
-      - 8191:8191
     security_opt:
       - no-new-privileges:true
     cap_drop:
       - ALL
-    networks:
-      - arr
 
 
   # image used for vpn killswitch network
@@ -166,6 +163,7 @@ services:
       - 5030:5030 # soulseek web ui
       - 5031:5031 # soulseek https web ui
       - 9696:9696 # prowlarr web ui
+      - 8191:8191 # flaresolverr web ui
     healthcheck:
       test: ping -c 1 www.google.com || exit 1
       interval: 30s
@@ -185,7 +183,6 @@ services:
       - LISTENING_ADDRESS=0.0.0.0
       - VPN_INPUT_PORTS=8080,63758
       - VPN_PORT_FORWARDING_UP_COMMAND=/bin/sh -c 'wget -O- --retry-connrefused --post-data "json={\"listen_port\":{{PORTS}}}" http://127.0.0.1:8088/api/v2/app/setPreferences 2>&1'
-      - DNS_ADDRESS=127.0.0.11
       #- IPV6_ENABLED=false
     volumes:
       - ${CONFIG_PATH}/gluetun:/gluetun
@@ -262,12 +259,12 @@ services:
     restart: unless-stopped
     networks:
       - arr
+      - media_network
 
 
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest
     container_name: bazarr
-    user: "1000:1000"
     depends_on:
       gluetun:
         condition: service_healthy
@@ -321,7 +318,7 @@ services:
     networks:
       - arr
     healthcheck:
-      test: ["CMD", "curl", "--fail", "http://127.0.0.1:6969/whisparr/ping"]
+      test: ["CMD", "curl", "--fail", "http://127.0.0.1:6969/ping"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -334,6 +331,7 @@ services:
       - CHOWN
       - SETUID
       - SETGID
+    restart: unless-stopped
 
   mamapi:
     image: elforkhead/mamapi:latest
@@ -344,7 +342,7 @@ services:
     restart: unless-stopped
     network_mode: "service:gluetun"
     volumes:
-      - ./mamapi/data:/data
+      - ${CONFIG_PATH}/mamapi:/data
     environment:
       TZ: Europe/Berlin 
       MAM_ID: ${MAM_SESSION_ID}
@@ -369,7 +367,6 @@ services:
     volumes:
       - ${CONFIG_PATH}/slskd:/app
       - ${MEDIA_PATH}/music:/music:rw
-      - ${MEDIA_PATH}/books:/ebooks:rw
       - ${SOULSEEK_PATH}:/downloads:rw
     depends_on:
       gluetun:
@@ -389,6 +386,7 @@ services:
       - CHOWN
       - SETGID
       - SETUID
+    restart: unless-stopped
 
 
   profilarr:
@@ -470,7 +468,6 @@ services:
       - CHOWN
       - SETUID
       - SETGID
-      - DAC_OVERRIDE
     restart: unless-stopped
     networks:
       - arr

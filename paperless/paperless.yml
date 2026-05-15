@@ -7,6 +7,12 @@ services:
       - redisdata:/data
     networks:
       - paperless
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
   db:
     image: docker.io/library/postgres:16
@@ -19,16 +25,26 @@ services:
       POSTGRES_PASSWORD: paperless
     networks:
       - paperless
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U paperless -d paperless"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   webserver:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     container_name: paperless
     restart: unless-stopped
     depends_on:
-      - db
-      - broker
-      - gotenberg
-      - tika
+      db:
+        condition: service_healthy
+      broker:
+        condition: service_healthy
+      gotenberg:
+        condition: service_started
+      tika:
+        condition: service_started
     healthcheck:
       test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://192.168.178.174:8001"]
       interval: 30s
@@ -85,8 +101,6 @@ services:
       - paperless
 
 volumes:
-  data:
-  media:
   pgdata:
   redisdata:
 

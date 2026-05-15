@@ -7,11 +7,10 @@ services:
     environment:
       - TZ=Europe/Berlin
       - VERSION=docker
-      - HOSTNAME="PLEX_SERVER"
+      - HOSTNAME=PLEX_SERVER
       - PLEX_CLAIM=claim-n3RF9y2y2jn6_pcRV-SQ
-      - ADVERTISE_IP="http://192.168.178.35:32400/,http://130.185.16.42:32401/"
+      - ADVERTISE_IP=http://192.168.178.35:32401/,http://130.185.16.42:32401/
     networks:
-      - default
       - media_network
     ports:
        - 32401:32400/tcp
@@ -43,7 +42,6 @@ services:
       # Set timezone
       - TZ=Europe/Berlin
     networks:
-      - default
       - media_network
     ports:
       - "8008:8008"      # Main web app
@@ -52,10 +50,12 @@ services:
     volumes:
       - ${CONFIG_PATH}/soulsync:/app/config
       - ${LOG_DIR}/soulsync:/app/logs
-      - ${SOULSEEK_PATH}:/downloads:rw
-      - ${MEDIA_PATH}:/data/media:rw
-      - soulsync_database:/app/data
+      - ${SOULSEEK_PATH}:/app/downloads:rw
+      - ${MEDIA_PATH}/music:/app/Transfer:rw
+      - soulsync_database:/app/database
     restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8008/"]
       interval: 30s
