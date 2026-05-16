@@ -160,7 +160,7 @@ services:
       - 3000:3000
     volumes:
       - ${DATABASE_DIR}/grafana:/var/lib/grafana
-      - ${CONFIG_PATH}/grafana/provisioning/:/etc/grafana/provisioning/:ro
+      - ${CONFIG_PATH}/grafana/provisioning:/etc/grafana/provisioning
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
@@ -241,6 +241,22 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    restart: unless-stopped
+
+  loki:
+    image: grafana/loki:latest
+    volumes:
+      - ${CONFIG_PATH}/loki/loki.yml:/etc/loki/local-config.yaml:ro
+      - ${DATABASE_DIR}/loki:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    restart: unless-stopped
+
+  promtail:
+    image: grafana/promtail:latest
+    volumes:
+      - ${CONFIG_PATH}/promtail/promtail.yml:/etc/promtail/config.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: -config.file=/etc/promtail/config.yml
     restart: unless-stopped
 
 
