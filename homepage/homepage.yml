@@ -15,9 +15,9 @@ services:
       - PORT=3123
       - HOMEPAGE_ALLOWED_HOSTS=moritzpalm.com,192.168.178.35:3123
     volumes:
-      - $CONFIG_PATH:/app/config
+      - ${CONFIG_PATH}/homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./data:/data
+      - ${CONFIG_PATH}/homepage/data:/data
     restart: always
     ports:
       - 3123:3123
