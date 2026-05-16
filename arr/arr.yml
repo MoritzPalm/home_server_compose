@@ -166,6 +166,7 @@ services:
       - 5031:5031 # soulseek https web ui
       - 9696:9696 # prowlarr web ui
       - 8191:8191 # flaresolverr web ui
+      - 5010:5010 # Mousehole port
     healthcheck:
       test: ping -c 1 www.google.com || exit 1
       interval: 30s
@@ -338,29 +339,17 @@ services:
       - no-new-privileges:true
     restart: unless-stopped
 
-  mamapi:
-    image: elforkhead/mamapi:latest
-    container_name: mamapi
-    depends_on:
-      gluetun:
-        condition: service_healthy
-    restart: unless-stopped
+  mousehole:
+    image: tmmrtn/mousehole:latest
     network_mode: "service:gluetun"
-    volumes:
-      - ${CONFIG_PATH}/mamapi:/data
     environment:
-      TZ: Europe/Berlin 
-      MAM_ID: ${MAM_SESSION_ID}
-      WRITE_CURRENT_MAMID: True
-      SHUTDOWN_ON_DISCONNECT: True
+      TZ: Europe/Berlin
+    volumes:
+      # persist cookie data across container restarts
+      - "${CONFIG_PATH}/mousehole:/srv/mousehole"
+    restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    healthcheck:
-      test: ["CMD-SHELL", "test -f /data/mam.txt || exit 1"]
-      interval: 60s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
 
 
   slskd:
