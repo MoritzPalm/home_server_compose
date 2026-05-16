@@ -11,9 +11,15 @@ services:
 
     ports:
       - 9443:9443
-    env_file: 
+    env_file:
       - path: ./.env
         required: true
+    labels:
+      - "homepage.group=Monitoring"
+      - "homepage.name=Portainer"
+      - "homepage.icon=portainer"
+      - "homepage.href=https://${HOST_IP}:9443"
+      - "homepage.description=Container management"
 
 
 volumes:

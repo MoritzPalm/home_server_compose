@@ -68,6 +68,12 @@ services:
       retries: 3
       start_period: 60s  # Longer start period for migrations
     restart: unless-stopped
+    labels:
+      - "homepage.group=Kitchen"
+      - "homepage.name=Tandoor"
+      - "homepage.icon=tandoor"
+      - "homepage.href=http://${HOST_IP}:9815"
+      - "homepage.description=Recipe manager"
 
   
 volumes:

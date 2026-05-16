@@ -16,3 +16,9 @@ services:
     depends_on:
       - backend
     hostname: hevy_frontend
+    labels:
+      - "homepage.group=Fitness"
+      - "homepage.name=Hevy Insights"
+      - "homepage.icon=hevy"
+      - "homepage.href=http://${HOST_IP}:8123"
+      - "homepage.description=Workout analytics"

@@ -20,6 +20,12 @@ services:
       db:
         condition: service_healthy
     restart: unless-stopped
+    labels:
+      - "homepage.group=Productivity"
+      - "homepage.name=Vikunja"
+      - "homepage.icon=vikunja"
+      - "homepage.href=http://${HOST_IP}:3456"
+      - "homepage.description=Task manager"
   db:
     image: postgres:17
     container_name: vikunja_db

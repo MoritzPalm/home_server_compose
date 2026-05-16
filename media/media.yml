@@ -29,6 +29,12 @@ services:
       - "${CONFIG_PATH}/plex:/config"
       - "/dev/shm:/transcode"
       - "${MEDIA_PATH}:/data/media"
+    labels:
+      - "homepage.group=Media"
+      - "homepage.name=Plex"
+      - "homepage.icon=plex"
+      - "homepage.href=http://${HOST_IP}:32401"
+      - "homepage.description=Media server"
 
   soulsync:
     image: boulderbadgedad/soulsync:latest
@@ -62,6 +68,12 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
+    labels:
+      - "homepage.group=Music"
+      - "homepage.name=SoulSync"
+      - "homepage.icon=soulsync"
+      - "homepage.href=http://${HOST_IP}:8008"
+      - "homepage.description=Music sync"
 
 
 volumes:

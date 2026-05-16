@@ -40,6 +40,12 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+    labels:
+      - "homepage.group=Monitoring"
+      - "homepage.name=Prometheus"
+      - "homepage.icon=prometheus"
+      - "homepage.href=http://${HOST_IP}:9090"
+      - "homepage.description=Metrics"
 
 
   node-exporter:
@@ -98,6 +104,12 @@ services:
       retries: 3
       start_period: 10s
     restart: unless-stopped
+    labels:
+      - "homepage.group=Monitoring"
+      - "homepage.name=Alertmanager"
+      - "homepage.icon=alertmanager"
+      - "homepage.href=http://${HOST_IP}:9093"
+      - "homepage.description=Alerts"
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
@@ -130,7 +142,13 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
-    
+    labels:
+      - "homepage.group=Monitoring"
+      - "homepage.name=cAdvisor"
+      - "homepage.icon=cadvisor"
+      - "homepage.href=http://${HOST_IP}:8082"
+      - "homepage.description=Container metrics"
+
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -166,7 +184,13 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
-    
+    labels:
+      - "homepage.group=Monitoring"
+      - "homepage.name=Grafana"
+      - "homepage.icon=grafana"
+      - "homepage.href=http://${HOST_IP}:3000"
+      - "homepage.description=Dashboards"
+
   smartctl-exporter:
     image: matusnovak/prometheus-smartctl:latest
     container_name: smartctl-exporter

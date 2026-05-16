@@ -29,7 +29,13 @@ services:
       retries: 3
       start_period: 30s
     restart: unless-stopped
-      
+    labels:
+      - "homepage.group=Downloads"
+      - "homepage.name=Prowlarr"
+      - "homepage.icon=prowlarr"
+      - "homepage.href=http://${HOST_IP}:9696"
+      - "homepage.description=Indexer manager"
+
   sonarr:
     image: linuxserver/sonarr:latest
     container_name: sonarr
@@ -62,8 +68,13 @@ services:
     restart: unless-stopped
     networks:
       - arr
+    labels:
+      - "homepage.group=Arr"
+      - "homepage.name=Sonarr"
+      - "homepage.icon=sonarr"
+      - "homepage.href=http://${HOST_IP}:8989"
+      - "homepage.description=TV series"
 
- 
   radarr:
     image: linuxserver/radarr:latest
     container_name: radarr
@@ -96,7 +107,12 @@ services:
     restart: unless-stopped
     networks:
       - arr
-
+    labels:
+      - "homepage.group=Arr"
+      - "homepage.name=Radarr"
+      - "homepage.icon=radarr"
+      - "homepage.href=http://${HOST_IP}:7878"
+      - "homepage.description=Movies"
 
   lidarr:
     image: linuxserver/lidarr:latest
@@ -130,7 +146,13 @@ services:
     restart: unless-stopped
     networks:
       - arr
- 
+    labels:
+      - "homepage.group=Arr"
+      - "homepage.name=Lidarr"
+      - "homepage.icon=lidarr"
+      - "homepage.href=http://${HOST_IP}:8686"
+      - "homepage.description=Music"
+
 
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
@@ -150,6 +172,12 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+    labels:
+      - "homepage.group=Downloads"
+      - "homepage.name=FlareSolverr"
+      - "homepage.icon=flaresolverr"
+      - "homepage.href=http://${HOST_IP}:8191"
+      - "homepage.description=Cloudflare bypass"
 
 
   # image used for vpn killswitch network
@@ -230,6 +258,12 @@ services:
       - CHOWN
       - SETUID
       - SETGID
+    labels:
+      - "homepage.group=Downloads"
+      - "homepage.name=qBittorrent"
+      - "homepage.icon=qbittorrent"
+      - "homepage.href=http://${HOST_IP}:8088"
+      - "homepage.description=Torrent client"
 
   overseerr:
     image: sctx/overseerr:latest
@@ -260,6 +294,12 @@ services:
     networks:
       - arr
       - media_network
+    labels:
+      - "homepage.group=Requests"
+      - "homepage.name=Overseerr"
+      - "homepage.icon=overseerr"
+      - "homepage.href=http://${HOST_IP}:5055"
+      - "homepage.description=Media requests"
 
 
   bazarr:
@@ -296,7 +336,13 @@ services:
       - CHOWN
       - SETUID
       - SETGID
-  
+    labels:
+      - "homepage.group=Arr"
+      - "homepage.name=Bazarr"
+      - "homepage.icon=bazarr"
+      - "homepage.href=http://${HOST_IP}:6767"
+      - "homepage.description=Subtitles"
+
 
   whisparr:
     container_name: whisparr
@@ -315,6 +361,11 @@ services:
       - ${STORAGE_PATH}:/data
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
+      - "homepage.group=Arr"
+      - "homepage.name=Whisparr"
+      - "homepage.icon=whisparr"
+      - "homepage.href=http://${HOST_IP}:6969"
+      - "homepage.description=Adult content"
     networks:
       - arr
     healthcheck:
@@ -387,6 +438,12 @@ services:
       - SETGID
       - SETUID
     restart: unless-stopped
+    labels:
+      - "homepage.group=Music"
+      - "homepage.name=slskd"
+      - "homepage.icon=slskd"
+      - "homepage.href=http://${HOST_IP}:5030"
+      - "homepage.description=Soulseek client"
 
 
   profilarr:
@@ -417,6 +474,12 @@ services:
       - CHOWN
       - SETUID
       - SETGID
+    labels:
+      - "homepage.group=Arr"
+      - "homepage.name=Profilarr"
+      - "homepage.icon=profilarr"
+      - "homepage.href=http://${HOST_IP}:6868"
+      - "homepage.description=Quality profiles"
 
   bookshelf:
     image: ghcr.io/pennydreadful/bookshelf:hardcover
@@ -446,6 +509,12 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+    labels:
+      - "homepage.group=Books"
+      - "homepage.name=Bookshelf"
+      - "homepage.icon=bookshelf-traccar"
+      - "homepage.href=http://${HOST_IP}:8787"
+      - "homepage.description=Book tracker"
 
   audiobookrequest:
     image: markbeep/audiobookrequest:1
@@ -477,9 +546,14 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+    labels:
+      - "homepage.group=Books"
+      - "homepage.name=AudioBookRequest"
+      - "homepage.icon=audiobookshelf"
+      - "homepage.href=http://${HOST_IP}:8000"
+      - "homepage.description=Audiobook requests"
 
 
-   
 networks:
   arr:
     driver: bridge
