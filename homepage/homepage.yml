@@ -13,7 +13,7 @@ services:
       - HOMEPAGE_VAR_WEATHER_TIME=Europe/Berlin
       - HOMEPAGE_VAR_WEATHER_UNIT=metric
       - PORT=3123
-      - HOMEPAGE_ALLOWED_HOSTS=moritzpalm.com,192.168.178.35:3123
+      - HOMEPAGE_ALLOWED_HOSTS=moritzpalm.com,192.168.178.35:3123,100.78.131.48:3123
     volumes:
       - ${CONFIG_PATH}/homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
