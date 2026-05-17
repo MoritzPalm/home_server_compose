@@ -217,7 +217,7 @@ services:
       - WEBUI_PORT=8088
     volumes:
       - ${CONFIG_PATH}/qbittorrent:/config
-      - ${TORRENT_PATH}:/downloads/torrents
+      - ${STORAGE_PATH}:/data
     env_file:
       - ./.env
     depends_on:
