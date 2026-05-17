@@ -1,7 +1,7 @@
 services:
   backend:
     container_name: hevy_backend
-    image: casudo/hevy-insights-backend:latest
+    image: ghcr.io/casudo/hevy-insights-backend:latest
     restart: unless-stopped
     environment:
       - X_API_KEY=klean_kanteen_insulated
@@ -9,7 +9,7 @@ services:
 
   frontend:
     container_name: hevy_frontend
-    image: casudo/hevy-insights-frontend:latest
+    image: ghcr.io/casudo/hevy-insights-frontend:latest
     restart: unless-stopped
     ports:
       - 8123:8080
