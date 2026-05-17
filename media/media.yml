@@ -111,6 +111,41 @@ services:
       - "homepage.description=Media server"
 
 
+  stash:
+    image: stashapp/stash:latest
+    container_name: stash
+    networks:
+      - media_network
+    ports:
+      - 9999:9999
+    environment:
+      - TZ=Europe/Berlin
+      - STASH_STASH=/data/xxx/
+      - STASH_GENERATED=/generated/
+      - STASH_METADATA=/root/.stash/
+      - STASH_CACHE=/cache/
+    volumes:
+      - ${CONFIG_PATH}/stash:/root/.stash
+      - ${CONFIG_PATH}/stash/generated:/generated
+      - ${CONFIG_PATH}/stash/cache:/cache
+      - ${MEDIA_PATH}/xxx:/data/xxx
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:9999/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "homepage.group=Media"
+      - "homepage.name=Stash"
+      - "homepage.icon=stash"
+      - "homepage.href=http://${HOST_IP}:9999"
+      - "homepage.description=Adult content library"
+
+
 volumes:
   soulsync_database:
     driver: local
