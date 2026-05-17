@@ -75,6 +75,41 @@ services:
       - "homepage.href=http://${HOST_IP}:8008"
       - "homepage.description=Music sync"
 
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    user: "1000:1000"
+    networks:
+      - media_network
+    ports:
+      - 8096:8096       # HTTP web UI
+      - 8920:8920       # HTTPS web UI
+      - 7359:7359/udp   # Client auto-discovery
+    devices:
+      - "/dev/dri:/dev/dri"  # Intel Quicksync for HW transcode (shared with Plex)
+    environment:
+      - TZ=Europe/Berlin
+      - JELLYFIN_PublishedServerUrl=http://${HOST_IP}:8096
+    volumes:
+      - ${CONFIG_PATH}/jellyfin/config:/config
+      - ${CONFIG_PATH}/jellyfin/cache:/cache
+      - ${MEDIA_PATH}:/media
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8096/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "homepage.group=Media"
+      - "homepage.name=Jellyfin"
+      - "homepage.icon=jellyfin"
+      - "homepage.href=http://${HOST_IP}:8096"
+      - "homepage.description=Media server"
+
 
 volumes:
   soulsync_database:

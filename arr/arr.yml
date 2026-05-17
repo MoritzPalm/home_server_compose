@@ -307,7 +307,7 @@ services:
 
   whisparr:
     container_name: whisparr
-    image: ghcr.io/hotio/whisparr:v3-3.0.0.1124
+    image: ghcr.io/hotio/whisparr:v3
     depends_on:
       gluetun:
         condition: service_healthy
