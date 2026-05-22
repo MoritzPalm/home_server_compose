@@ -116,6 +116,7 @@ services:
     container_name: stash
     networks:
       - media_network
+      - arr
     ports:
       - 9999:9999
     environment:
@@ -239,4 +240,6 @@ volumes:
 
 networks:
   media_network:
+    external: true
+  arr:
     external: true

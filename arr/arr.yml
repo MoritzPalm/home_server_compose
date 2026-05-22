@@ -472,6 +472,23 @@ services:
       - "homepage.href=http://${HOST_IP}:8000"
       - "homepage.description=Audiobook requests"
 
+  cross-seed:
+    image: ghcr.io/cross-seed/cross-seed:6
+    container_name: cross-seed
+    user:
+      - 1000:1000
+    ports:
+      - "2468:2468"
+    volumes:
+      - ${CONFIG_PATH}/cross-seed:/config
+      - ${STORAGE_PATH}:/data
+    command: daemon
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    
+
+
 
 networks:
   arr:
