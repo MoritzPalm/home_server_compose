@@ -483,6 +483,8 @@ services:
       - ${STORAGE_PATH}:/data
     command: daemon
     restart: unless-stopped
+    networks:
+      - arr
     security_opt:
       - no-new-privileges:true
     
