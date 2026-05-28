@@ -202,7 +202,7 @@ services:
       test: redis-cli ping || exit 1
     restart: always
     networks:
-     - internal
+     - media_network 
 
   database:
     container_name: immich_postgres:latest

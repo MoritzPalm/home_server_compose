@@ -3,7 +3,7 @@ services:
   prowlarr:
     image: linuxserver/prowlarr:latest
     container_name: prowlarr
-    # using a vpn here is mainly to use the existing MAM Session which is dynamically updated by the mam_api container
+    # using a vpn here is mainly to use the existing MAM Session which is dynamically updated by the mousehole container
     depends_on:
       gluetun:
         condition: service_healthy
