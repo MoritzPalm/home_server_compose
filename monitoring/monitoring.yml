@@ -20,7 +20,7 @@ services:
       cadvisor:
         condition: service_healthy
       node-exporter:
-        condition: service_healthy
+        condition: service_started
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -54,9 +54,9 @@ services:
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command: 
-      - '--path.procfs=/host/proc' 
+      - /:/rootfs:ro,rslave
+    command:
+      - '--path.procfs=/host/proc'
       - '--path.sysfs=/host/sys'
       - '--path.rootfs=/rootfs'
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
@@ -70,12 +70,6 @@ services:
       - ALL
     cap_add:
       - SYS_TIME
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9100/metrics"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
     restart: unless-stopped
 
 
@@ -192,19 +186,16 @@ services:
       - "homepage.description=Dashboards"
 
   smartctl-exporter:
-    image: matusnovak/prometheus-smartctl:latest
+    image: prometheuscommunity/smartctl-exporter:latest
     container_name: smartctl-exporter
     privileged: true
+    user: root
+    command:
+      - '--web.listen-address=:9902'
     ports:
       - "9902:9902"
     security_opt:
       - no-new-privileges:true
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9902/metrics"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
     restart: unless-stopped
     networks:
       - monitoring
@@ -245,19 +236,25 @@ services:
 
   loki:
     image: grafana/loki:latest
+    container_name: loki
     volumes:
       - ${CONFIG_PATH}/loki/loki.yml:/etc/loki/local-config.yaml:ro
       - ${DATABASE_DIR}/loki:/loki
     command: -config.file=/etc/loki/local-config.yaml
     restart: unless-stopped
+    networks:
+      - monitoring
 
   promtail:
     image: grafana/promtail:latest
+    container_name: promtail
     volumes:
       - ${CONFIG_PATH}/promtail/promtail.yml:/etc/promtail/config.yml:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     command: -config.file=/etc/promtail/config.yml
     restart: unless-stopped
+    networks:
+      - monitoring
 
 
 networks:
