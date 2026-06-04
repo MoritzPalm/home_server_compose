@@ -493,7 +493,7 @@ services:
 
 networks:
   arr:
-    driver: bridge
+    external: true
   media_network:
     external: true
 

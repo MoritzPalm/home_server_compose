@@ -244,6 +244,5 @@ volumes:
 
 networks:
   media_network:
-    external: true
   arr:
     external: true
