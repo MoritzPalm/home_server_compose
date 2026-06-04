@@ -200,39 +200,35 @@ services:
     networks:
       - monitoring
 
-  watchtower:
-    image: containrrr/watchtower:latest
-    container_name: watchtower
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /etc/localtime:/etc/localtime:ro
-    environment:
-      - WATCHTOWER_NOTIFICATIONS_LEVEL=info
-      - WATCHTOWER_NOTIFICATIONS=shoutrrr
-      - WATCHTOWER_NOTIFICATION_URL=discord://${WATCHTOWER_DISCORD_TOKEN}@${WATCHTOWER_DISCORD_WEBHOOKID}
-      - WATCHTOWER_SCHEDULE=0 0 4 * * *
-      - WATCHTOWER_CLEANUP=true
-      - WATCHTOWER_TIMEOUT=30s
-      - WATCHTOWER_INCLUDE_RESTARTING=true
-      - WATCHTOWER_ROLLING_RESTART=false
-      - WATCHTOWER_INCLUDE_STOPPED=true
-      - WATCHTOWER_REVIVE_STOPPED=false
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    restart: unless-stopped
+  # watchtower removed: containrrr/watchtower is unmaintained (last release
+  # 2023) and its bundled Docker client (API 1.25) is rejected by the daemon
+  # (min 1.40). We no longer auto-apply updates — WUD below detects updates and
+  # notifies, and updates are applied deliberately by re-running the playbook.
 
   whatsupdocker:
-    image: getwud/wud
+    image: getwud/wud:latest
     container_name: wud
-    volumes: 
+    volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      # WUD fires once per detected update (not on every scan) by default.
+      - WUD_TRIGGER_DISCORD_1_URL=https://discord.com/api/webhooks/${WATCHTOWER_DISCORD_WEBHOOKID}/${WATCHTOWER_DISCORD_TOKEN}
+      - WUD_TRIGGER_DISCORD_1_BOTUSERNAME=WUD
+    ports:
+      - 3001:3000
     security_opt:
       - no-new-privileges:true
     cap_drop:
       - ALL
     restart: unless-stopped
+    networks:
+      - monitoring
+    labels:
+      - "homepage.group=Monitoring"
+      - "homepage.name=WUD"
+      - "homepage.icon=wud"
+      - "homepage.href=http://${HOST_IP}:3001"
+      - "homepage.description=Image update notifications"
 
   loki:
     image: grafana/loki:latest
