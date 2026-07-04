@@ -11,6 +11,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
+      - UMASK=002
       - TZ=Europe/Berlin
     volumes:
       - ${CONFIG_PATH}/prowlarr:/config # database and Prowlarr configs
@@ -41,6 +42,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
+      - UMASK=002
       - TZ=Europe/Berlin
     volumes:
       - ${CONFIG_PATH}/sonarr:/config # database and Sonarr configs
@@ -74,6 +76,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
+      - UMASK=002
       - TZ=Europe/Berlin
     volumes:
       - ${CONFIG_PATH}/radarr:/config
@@ -107,6 +110,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
+      - UMASK=002
       - TZ=Europe/Berlin
     volumes:
       - ${CONFIG_PATH}/lidarr:/config
@@ -213,6 +217,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
+      - UMASK=002
       - TZ=Europe/Berlin
       - WEBUI_PORT=8088
     volumes:
@@ -280,6 +285,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
+      - UMASK=002
       - TZ=Europe/Berlin
     volumes:
       - ${CONFIG_PATH}/bazarr:/config
@@ -316,6 +322,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
+      - UMASK=002
       - TZ=Europe/Berlin
     volumes:
       - ${CONFIG_PATH}/whisparr:/config
@@ -391,6 +398,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
+      - UMASK=002
       - TZ=Europe/Berlin
     restart: unless-stopped
     networks:
@@ -416,6 +424,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
+      - UMASK=002
     ports:
       - 8787:8787
     volumes:

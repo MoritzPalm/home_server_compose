@@ -1,0 +1,16 @@
+# Reference mirror of the Uptime Kuma stack that runs on the Pi monitor.
+# The live deployment is templated onto the Pi by the `pi_monitor` Ansible role
+# (roles/pi_monitor/templates/uptime-kuma.yml.j2); this copy exists only so the
+# stack is versioned alongside the others. Not deployed to mserver.
+services:
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    volumes:
+      - ${DATABASE_DIR}/uptime-kuma:/app/data
+    ports:
+      - ${UPTIME_KUMA_PORT:-3002}:3001
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
