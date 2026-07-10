@@ -5,6 +5,8 @@ services:
     restart: unless-stopped
     volumes:
       - redisdata:/data
+    security_opt:
+      - no-new-privileges:true
     networks:
       - paperless
     healthcheck:
@@ -22,7 +24,9 @@ services:
     environment:
       POSTGRES_DB: paperless
       POSTGRES_USER: paperless
-      POSTGRES_PASSWORD: paperless
+      POSTGRES_PASSWORD: ${PAPERLESS_DB_PASSWORD:-paperless}
+    security_opt:
+      - no-new-privileges:true
     networks:
       - paperless
     healthcheck:
@@ -46,7 +50,9 @@ services:
       tika:
         condition: service_started
     healthcheck:
-      test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://192.168.178.174:8001"]
+      # probe the app directly on its internal port; going through a host IP
+      # tests the port mapping of whatever machine this used to run on
+      test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:8000"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -59,6 +65,7 @@ services:
     environment:
       PAPERLESS_REDIS: redis://broker:6379
       PAPERLESS_DBHOST: db
+      PAPERLESS_DBPASS: ${PAPERLESS_DB_PASSWORD:-paperless}
       PAPERLESS_TIKA_ENABLED: 1
       PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
@@ -102,6 +109,8 @@ services:
   tika:
     image: docker.io/apache/tika:latest
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     networks:
       - paperless
 

@@ -13,12 +13,14 @@ services:
       - HOMEPAGE_VAR_WEATHER_TIME=Europe/Berlin
       - HOMEPAGE_VAR_WEATHER_UNIT=metric
       - PORT=3123
-      - HOMEPAGE_ALLOWED_HOSTS=moritzpalm.com,192.168.178.35:3123,100.78.131.48:3123
+      - HOMEPAGE_ALLOWED_HOSTS=moritzpalm.com,${LAN_IP}:3123,${HOST_IP}:3123
     volumes:
       - ${CONFIG_PATH}/homepage:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${CONFIG_PATH}/homepage/data:/data
-    restart: always
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
     ports:
       - 3123:3123
     #command: [sh, -c, "cp -n /app/config/tpl/*.yaml /app/config && node server.js"]

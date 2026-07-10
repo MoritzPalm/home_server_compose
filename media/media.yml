@@ -3,13 +3,14 @@ services:
   plex-server:
     container_name: plex
     image: 'plexinc/pms-docker:latest'
-    restart: always
+    restart: unless-stopped
     environment:
       - TZ=Europe/Berlin
       - VERSION=docker
       - HOSTNAME=PLEX_SERVER
-      - PLEX_CLAIM=claim-n3RF9y2y2jn6_pcRV-SQ
-      - ADVERTISE_IP=http://192.168.178.35:32401/,http://130.185.16.42:32401/
+      # PLEX_CLAIM only matters on first setup; empty once the server is claimed
+      - PLEX_CLAIM=${PLEX_CLAIM:-}
+      - ADVERTISE_IP=http://${LAN_IP}:32401/,http://${PUBLIC_IP}:32401/
     networks:
       - media_network
     ports:
@@ -29,6 +30,8 @@ services:
       - "${CONFIG_PATH}/plex:/config"
       - "/dev/shm:/transcode"
       - "${MEDIA_PATH}:/data/media"
+    security_opt:
+      - no-new-privileges:true
     labels:
       - "homepage.group=Media"
       - "homepage.name=Plex"
@@ -60,6 +63,8 @@ services:
       - ${MEDIA_PATH}/music:/app/Transfer:rw
       - soulsync_database:/app/database
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     extra_hosts:
       - "host.docker.internal:host-gateway"
     healthcheck:
@@ -243,6 +248,10 @@ volumes:
 
 
 networks:
+  # pre-created by the ansible docker role and shared with the arr stack;
+  # without external:true compose would create a project-scoped
+  # media_media_network and the two stacks would not actually be connected
   media_network:
+    external: true
   arr:
     external: true

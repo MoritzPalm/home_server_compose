@@ -184,7 +184,7 @@ services:
       - OPENVPN_USER=${OPENVPN_USERNAME}
       - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
       - VPN_PORT_FORWARDING=on
-      - FIREWALL_INPUT_PORTS=8088,5030,5031,9696,8191
+      - FIREWALL_INPUT_PORTS=8088,5030,5031,9696,8191,5010
       - EXTRA_SUBNETS=192.168.178.0/24
       - FIREWALL_ALLOWED_SUBNETS=192.168.178.0/24
       - LISTENING_ADDRESS=0.0.0.0
@@ -223,8 +223,6 @@ services:
     volumes:
       - ${CONFIG_PATH}/qbittorrent:/config
       - ${STORAGE_PATH}:/data
-    env_file:
-      - ./.env
     depends_on:
       gluetun:
         condition: service_healthy
@@ -328,7 +326,6 @@ services:
       - ${CONFIG_PATH}/whisparr:/config
       - ${STORAGE_PATH}:/data
     labels:
-      - "com.centurylinklabs.watchtower.enable=false"
       - "homepage.group=Arr"
       - "homepage.name=Whisparr"
       - "homepage.icon=whisparr"

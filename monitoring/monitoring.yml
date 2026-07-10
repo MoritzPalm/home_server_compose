@@ -12,13 +12,13 @@ services:
       - '--storage.tsdb.path=/prometheus'
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
-      - '--web.enable-lifecycle'
-      - '--web.enable-admin-api'
     ports:
       - 9090:9090
+    # ordering only — prometheus handles down targets fine, so don't refuse
+    # to start (and take monitoring down) just because an exporter is unhealthy
     depends_on:
       cadvisor:
-        condition: service_healthy
+        condition: service_started
       node-exporter:
         condition: service_started
     security_opt:
@@ -237,6 +237,8 @@ services:
       - ${CONFIG_PATH}/loki/loki.yml:/etc/loki/local-config.yaml:ro
       - ${DATABASE_DIR}/loki:/loki
     command: -config.file=/etc/loki/local-config.yaml
+    security_opt:
+      - no-new-privileges:true
     restart: unless-stopped
     networks:
       - monitoring
@@ -248,6 +250,8 @@ services:
       - ${CONFIG_PATH}/promtail/promtail.yml:/etc/promtail/config.yml:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     command: -config.file=/etc/promtail/config.yml
+    security_opt:
+      - no-new-privileges:true
     restart: unless-stopped
     networks:
       - monitoring

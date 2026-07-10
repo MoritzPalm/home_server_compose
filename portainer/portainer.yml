@@ -11,9 +11,10 @@ services:
 
     ports:
       - 9443:9443
-    env_file:
-      - path: ./.env
-        required: true
+    environment:
+      - PORTAINER_LICENSE_KEY=${PORTAINER_LICENSE_KEY}
+    security_opt:
+      - no-new-privileges:true
     labels:
       - "homepage.group=Monitoring"
       - "homepage.name=Portainer"

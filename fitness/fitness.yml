@@ -4,7 +4,9 @@ services:
     image: ghcr.io/casudo/hevy-insights-backend:latest
     restart: unless-stopped
     environment:
-      - X_API_KEY=klean_kanteen_insulated
+      - X_API_KEY=${hevy_X_API_KEY}
+    security_opt:
+      - no-new-privileges:true
     hostname: hevy_backend
 
   frontend:
@@ -15,6 +17,8 @@ services:
       - 8123:8080
     depends_on:
       - backend
+    security_opt:
+      - no-new-privileges:true
     hostname: hevy_frontend
     labels:
       - "homepage.group=Fitness"
