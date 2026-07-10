@@ -248,6 +248,7 @@ services:
     container_name: promtail
     volumes:
       - ${CONFIG_PATH}/promtail/promtail.yml:/etc/promtail/config.yml:ro
+      - ${DATABASE_DIR}/promtail:/positions
       - /var/run/docker.sock:/var/run/docker.sock:ro
     command: -config.file=/etc/promtail/config.yml
     security_opt:
