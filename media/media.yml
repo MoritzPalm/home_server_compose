@@ -2,7 +2,7 @@
 services:
   plex-server:
     container_name: plex
-    image: 'plexinc/pms-docker:latest'
+    image: 'plexinc/pms-docker:latest@sha256:c37106c57fed7a6624f5dee5a3ce460ff011f09a2aa7f4ee9e8dbbd08ae1b87e'
     restart: unless-stopped
     environment:
       - TZ=Europe/Berlin
@@ -81,7 +81,7 @@ services:
       - "homepage.description=Music sync"
 
   jellyfin:
-    image: jellyfin/jellyfin:latest
+    image: jellyfin/jellyfin:latest@sha256:aefb67e6a7ff1debdd154a78a7bbb780fd0c873d8639210a7f6a2016ad2b35db
     container_name: jellyfin
     user: "1000:1000"
     networks:
@@ -117,7 +117,7 @@ services:
 
 
   stash:
-    image: stashapp/stash:latest
+    image: stashapp/stash:latest@sha256:df744af5a0c976e2ec671052ecc1f8a9aa757fa12b8f9930b59910b7295f0da6
     container_name: stash
     networks:
       - media_network
