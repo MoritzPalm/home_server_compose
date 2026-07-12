@@ -13,7 +13,7 @@ services:
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
     ports:
-      - 9090:9090
+      - ${HOST_IP}:9090:9090
     # ordering only — prometheus handles down targets fine, so don't refuse
     # to start (and take monitoring down) just because an exporter is unhealthy
     depends_on:
@@ -61,7 +61,7 @@ services:
       - '--path.rootfs=/rootfs'
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
     ports:
-      - 9100:9100
+      - ${HOST_IP}:9100:9100
     networks:
       - monitoring
     security_opt:
@@ -81,7 +81,7 @@ services:
       - '--config.file=/etc/alertmanager/config.yml'
       - '--storage.path=/alertmanager'
     ports:
-      - 9093:9093
+      - ${HOST_IP}:9093:9093
     volumes:
       - ${CONFIG_PATH}/alertmanager:/etc/alertmanager:ro
       - ${DATABASE_DIR}/alertmanager:/alertmanager
@@ -112,7 +112,7 @@ services:
       - '--housekeeping_interval=55s'
       - '--docker_only'
     ports:
-      - 8082:8080
+      - ${HOST_IP}:8082:8080
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
@@ -151,7 +151,7 @@ services:
       prometheus:
         condition: service_healthy
     ports:
-      - 3000:3000
+      - ${HOST_IP}:3000:3000
     volumes:
       - ${DATABASE_DIR}/grafana:/var/lib/grafana
       - ${CONFIG_PATH}/grafana/provisioning:/etc/grafana/provisioning
@@ -193,7 +193,7 @@ services:
     command:
       - '--web.listen-address=:9902'
     ports:
-      - "9902:9902"
+      - "${HOST_IP}:9902:9902"
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
@@ -205,17 +205,42 @@ services:
   # (min 1.40). We no longer auto-apply updates — WUD below detects updates and
   # notifies, and updates are applied deliberately by re-running the playbook.
 
+  # Read-only, POST-blocking proxy in front of the docker socket. A :ro socket
+  # bind does NOT make the docker API read-only (POST still works through it),
+  # so wud and promtail previously had near-root API access. This proxy only
+  # exposes the GET endpoints they need and refuses POST/exec/etc.
+  dockerproxy:
+    image: tecnativa/docker-socket-proxy:0.3.0
+    container_name: monitoring_dockerproxy
+    environment:
+      - CONTAINERS=1   # wud + promtail: list/inspect containers, read logs
+      - IMAGES=1       # wud: compare image tags/digests
+      - INFO=1
+      - VERSION=1
+      - EVENTS=1       # promtail service discovery watches the event stream
+      - POST=0         # deny all writes (create/start/kill/exec)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    networks:
+      - monitoring
+
   whatsupdocker:
     image: getwud/wud:latest
     container_name: wud
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - dockerproxy
     environment:
+      # talk to docker via the proxy, not the raw socket
+      - WUD_WATCHER_LOCAL_HOST=dockerproxy
+      - WUD_WATCHER_LOCAL_PORT=2375
       # WUD fires once per detected update (not on every scan) by default.
       - WUD_TRIGGER_DISCORD_1_URL=https://discord.com/api/webhooks/${WATCHTOWER_DISCORD_WEBHOOKID}/${WATCHTOWER_DISCORD_TOKEN}
       - WUD_TRIGGER_DISCORD_1_BOTUSERNAME=WUD
     ports:
-      - 3001:3000
+      - ${HOST_IP}:3001:3000
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -246,10 +271,11 @@ services:
   promtail:
     image: grafana/promtail:latest
     container_name: promtail
+    depends_on:
+      - dockerproxy
     volumes:
       - ${CONFIG_PATH}/promtail/promtail.yml:/etc/promtail/config.yml:ro
       - ${DATABASE_DIR}/promtail:/positions
-      - /var/run/docker.sock:/var/run/docker.sock:ro
     command: -config.file=/etc/promtail/config.yml
     security_opt:
       - no-new-privileges:true

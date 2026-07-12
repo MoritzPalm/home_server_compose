@@ -311,7 +311,7 @@ services:
 
   whisparr:
     container_name: whisparr
-    image: ghcr.io/hotio/whisparr:v3
+    image: ghcr.io/hotio/whisparr:v3@sha256:34653e1cf10b99532b56f8afecbca449d32bf460b2b03990b7ecff898e789c13
     depends_on:
       gluetun:
         condition: service_healthy
@@ -344,7 +344,8 @@ services:
     restart: unless-stopped
 
   mousehole:
-    image: tmmrtn/mousehole:latest
+    # digest-pinned (single-maintainer image); bump deliberately when WUD flags it
+    image: tmmrtn/mousehole:latest@sha256:001985b5f102af9facd7b51ca9b82e9f8b0d8cdb10d67f543b2d03c4b3e2fc10
     network_mode: "service:gluetun"
     environment:
       TZ: Europe/Berlin
@@ -357,7 +358,7 @@ services:
 
 
   slskd:
-    image: slskd/slskd:latest
+    image: slskd/slskd:latest@sha256:ab9ed50e028b524cefdb7c1dd8ebca368a076e18441ee8ac2326473eb850b4c3
     container_name: slskd
     user: 1000:1000
     volumes:
@@ -386,7 +387,7 @@ services:
 
 
   profilarr:
-    image: santiagosayshey/profilarr:latest
+    image: santiagosayshey/profilarr:latest@sha256:8a514f8429cd33885166facc9eb6504fa9ded056c737609e5e8ef32ae0afb350
     container_name: profilarr
     ports:
       - 6868:6868
@@ -416,7 +417,7 @@ services:
       - "homepage.description=Quality profiles"
 
   bookshelf:
-    image: ghcr.io/pennydreadful/bookshelf:hardcover
+    image: ghcr.io/pennydreadful/bookshelf:hardcover@sha256:388eecc94362580eae31ee0a454be6af516f8a311f8432a521c202fb475f4359
     container_name: bookshelf
     environment:
       - PUID=1000
@@ -446,7 +447,7 @@ services:
       - "homepage.description=Book tracker"
 
   audiobookrequest:
-    image: markbeep/audiobookrequest:1
+    image: markbeep/audiobookrequest:1@sha256:c9ce1a57a52dc06398219feebdcaac289d5502a62ebedd087dabb3d21e63ba3b
     container_name: audiobookrequest
     user: "1000:1000"
     ports: 
@@ -479,7 +480,7 @@ services:
       - "homepage.description=Audiobook requests"
 
   cross-seed:
-    image: ghcr.io/cross-seed/cross-seed:6
+    image: ghcr.io/cross-seed/cross-seed:6@sha256:a1fed512261fd968c55cb03c51cff9c6620aa76a34b3b591afca95c890aa8225
     container_name: cross-seed
     user: "1000:1000"
     ports:

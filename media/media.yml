@@ -40,7 +40,7 @@ services:
       - "homepage.description=Media server"
 
   soulsync:
-    image: boulderbadgedad/soulsync:latest
+    image: boulderbadgedad/soulsync:latest@sha256:49a1b44e981c76541b20fb2a5fc90a877357d1e08e8d12d84246a88da851f18e
     container_name: soulsync
     environment:
       - PUID=1000

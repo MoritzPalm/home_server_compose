@@ -16,8 +16,9 @@ services:
       - HOMEPAGE_ALLOWED_HOSTS=moritzpalm.com,${LAN_IP}:3123,${HOST_IP}:3123
     volumes:
       - ${CONFIG_PATH}/homepage:/app/config
-      - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${CONFIG_PATH}/homepage/data:/data
+    depends_on:
+      - dockerproxy
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
@@ -37,6 +38,20 @@ services:
       - "traefik.http.services.homepage.loadbalancer.server.port=3123"
       - "traefik.docker.network=external"
 
+
+   dockerproxy:
+    image: tecnativa/docker-socket-proxy:0.3.0
+    container_name: homepage_dockerproxy
+    environment:
+      - CONTAINERS=1
+      - POST=0
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    networks:
+      - internal
 
 
 networks:

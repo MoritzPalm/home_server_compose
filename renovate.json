@@ -1,0 +1,44 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "docker:pinDigests",
+    ":semanticCommitsDisabled"
+  ],
+  "minimumReleaseAge": "3 days",
+  "schedule": ["before 6am on monday"],
+  "docker-compose": {
+    "managerFilePatterns": ["/\\.ya?ml$/"]
+  },
+  "packageRules": [
+    {
+      "description": "Auto tier: stateless apps auto-merge safe updates (pin/digest/patch/minor). Majors still fall through to the major rule below.",
+      "matchManagers": ["docker-compose"],
+      "matchUpdateTypes": ["pin", "digest", "patch", "minor"],
+      "automerge": true
+    },
+    {
+      "description": "Major versions are never auto-merged: open a PR only after I approve it on the dependency dashboard.",
+      "matchManagers": ["docker-compose"],
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "dependencyDashboardApproval": true,
+      "addLabels": ["update/major"]
+    },
+    {
+      "description": "Frozen data layer: Postgres, valkey/redis and all Immich images move only after manual review (Postgres majors need pg_upgrade; Immich ships breaking migrations). No PR until approved on the dashboard.",
+      "matchManagers": ["docker-compose"],
+      "matchPackageNames": ["/postgres/", "/valkey/", "/redis/", "/immich-app/"],
+      "automerge": false,
+      "dependencyDashboardApproval": true,
+      "addLabels": ["update/frozen-review"]
+    },
+    {
+      "description": "Disruptive / config-sensitive: media servers and the VPN download stack get a normal PR but never auto-merge — merge by hand to avoid mid-stream restarts or a broken killswitch.",
+      "matchManagers": ["docker-compose"],
+      "matchPackageNames": ["/plexinc/", "/jellyfin/", "/gluetun/", "/qbittorrent/", "/slskd/"],
+      "automerge": false,
+      "addLabels": ["update/review"]
+    }
+  ]
+}

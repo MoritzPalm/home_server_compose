@@ -10,7 +10,7 @@ services:
       - /srv/compose/portainer/admin_password.txt:/run/secrets/portainer_admin_password:ro
 
     ports:
-      - 9443:9443
+      - ${HOST_IP}:9443:9443
     environment:
       - PORTAINER_LICENSE_KEY=${PORTAINER_LICENSE_KEY}
     security_opt:

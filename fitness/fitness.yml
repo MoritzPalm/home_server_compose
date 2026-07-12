@@ -1,7 +1,7 @@
 services:
   backend:
     container_name: hevy_backend
-    image: ghcr.io/casudo/hevy-insights-backend:latest
+    image: ghcr.io/casudo/hevy-insights-backend:latest@sha256:38d012dc717905fcb2f2d6b199feec10414d95627657943b8167dbeb79cc5f75
     restart: unless-stopped
     environment:
       - X_API_KEY=${hevy_X_API_KEY}
@@ -11,7 +11,7 @@ services:
 
   frontend:
     container_name: hevy_frontend
-    image: ghcr.io/casudo/hevy-insights-frontend:latest
+    image: ghcr.io/casudo/hevy-insights-frontend:latest@sha256:c91f6a63da07c67779acaf4ba5143958e398f9758fe8d1b1a5953a34ceb01283
     restart: unless-stopped
     ports:
       - 8123:8080
