@@ -1,7 +1,7 @@
 
 services:
   broker:
-    image: docker.io/library/redis:7
+    image: docker.io/library/redis:7@sha256:b2b95679e3b46fb51864949ed25ea976fc3a6bcc00a40a1bc00d568cb2822e50
     restart: unless-stopped
     volumes:
       - redisdata:/data
@@ -17,7 +17,7 @@ services:
       start_period: 10s
 
   db:
-    image: docker.io/library/postgres:16
+    image: docker.io/library/postgres:16@sha256:be01cf82fc7dbba824acf0a82e150b4b360f3ff93c6631d7844af431e841a95c
     restart: unless-stopped
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -37,7 +37,7 @@ services:
       start_period: 30s
 
   webserver:
-    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest@sha256:6c86cad803970ea782683a8e80e7403444c5bf3cf70de63b4d3c8e87500db92f
     container_name: paperless
     restart: unless-stopped
     depends_on:
@@ -94,7 +94,7 @@ services:
       - internal
 
   gotenberg:
-    image: docker.io/gotenberg/gotenberg:7.10
+    image: docker.io/gotenberg/gotenberg:7.10@sha256:d03b8a04c6e6c5e568b38f57352266dee4674849b71818774025f8f48d869a9a
     restart: unless-stopped
 
     # The gotenberg chromium route is used to convert .eml files. We do not
@@ -107,7 +107,7 @@ services:
       - paperless
 
   tika:
-    image: docker.io/apache/tika:latest
+    image: docker.io/apache/tika:latest@sha256:90b7fa1dc018434075fce9e1d9b88b1e3d0ea6979d0cf86e116c79a8073ae973
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true

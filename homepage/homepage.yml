@@ -1,7 +1,7 @@
 services:
 
    homepage:
-    image: ghcr.io/gethomepage/homepage:latest
+    image: ghcr.io/gethomepage/homepage:latest@sha256:a0b71c8e757298d02560186bab9fbe3fc2d375c523a62cc1019177b37e48aa28
     container_name: homepage
     environment:
       - HOMEPAGE_VAR_TITLE=MServer
@@ -40,7 +40,7 @@ services:
 
 
    dockerproxy:
-    image: tecnativa/docker-socket-proxy:0.3.0
+    image: tecnativa/docker-socket-proxy:0.3.0@sha256:9e4b9e7517a6b660f2cc903a19b257b1852d5b3344794e3ea334ff00ae677ac2
     container_name: homepage_dockerproxy
     environment:
       - CONTAINERS=1
