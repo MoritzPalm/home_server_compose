@@ -345,7 +345,7 @@ services:
 
   mousehole:
     # digest-pinned (single-maintainer image); bump deliberately when WUD flags it
-    image: tmmrtn/mousehole:latest@sha256:001985b5f102af9facd7b51ca9b82e9f8b0d8cdb10d67f543b2d03c4b3e2fc10
+    image: tmmrtn/mousehole:latest@sha256:2fc02b12362581e60bfd6adba788bda9eda93f8f31ed089581eeabcee4518b0d
     network_mode: "service:gluetun"
     environment:
       TZ: Europe/Berlin
