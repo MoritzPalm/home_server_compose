@@ -447,7 +447,7 @@ services:
       - "homepage.description=Book tracker"
 
   audiobookrequest:
-    image: markbeep/audiobookrequest:1.10.4@sha256:c9ce1a57a52dc06398219feebdcaac289d5502a62ebedd087dabb3d21e63ba3b
+    image: markbeep/audiobookrequest:1.10.6@sha256:8e946fb257b48bb1c81a7af4ed690782cebb77d304aafb015e63360251d44a09
     container_name: audiobookrequest
     user: "1000:1000"
     ports: 
