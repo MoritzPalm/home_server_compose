@@ -61,7 +61,7 @@ services:
       - ${LOG_DIR}/soulsync:/app/logs
       - ${SOULSEEK_PATH}:/app/downloads:rw
       - ${MEDIA_PATH}/music:/app/Transfer:rw
-      - soulsync_database:/app/database
+      - soulsync_database:/app/data
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
