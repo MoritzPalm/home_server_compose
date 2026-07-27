@@ -80,6 +80,46 @@ services:
       - "homepage.href=http://${HOST_IP}:8008"
       - "homepage.description=Music sync"
 
+  multi-scrobbler:
+    image: foxxmd/multi-scrobbler:0.14.2@sha256:b116e68f1937d5cb0edad0ff8d7af3a1eee56b979529e098fbc7c196adde5d39
+    container_name: multi-scrobbler
+    environment:
+      - TZ=Europe/Berlin
+      - PUID=1000
+      - PGID=1000
+      # external base URL — used to build the Spotify OAuth redirect and the
+      # Plex webhook URL shown in the UI. Must match the Spotify app redirect.
+      - BASE_URL=http://${HOST_IP}:9078
+      # --- Spotify source (reads your Spotify plays) ---
+      - SPOTIFY_CLIENT_ID=${MS_SPOTIFY_CLIENT_ID}
+      - SPOTIFY_CLIENT_SECRET=${MS_SPOTIFY_CLIENT_SECRET}
+      # --- Plex source (webhook) — filter to your Plex account ---
+      - PLEX_USER=${MS_PLEX_USER}
+      # --- ListenBrainz target (where everything is scrobbled) ---
+      - LZ_TOKEN=${MS_LISTENBRAINZ_TOKEN}
+      - LZ_USER=${MS_LISTENBRAINZ_USER}
+    networks:
+      - media_network
+    ports:
+      - "9078:9078"      # Web UI + Spotify OAuth callback + Plex webhook target
+    volumes:
+      - ${CONFIG_PATH}/multi-scrobbler:/config
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9078/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    labels:
+      - "homepage.group=Music"
+      - "homepage.name=Multi-Scrobbler"
+      - "homepage.icon=listenbrainz"
+      - "homepage.href=http://${HOST_IP}:9078"
+      - "homepage.description=Plex + Spotify → ListenBrainz scrobbling"
+
   jellyfin:
     image: jellyfin/jellyfin:10.11.11@sha256:aefb67e6a7ff1debdd154a78a7bbb780fd0c873d8639210a7f6a2016ad2b35db
     container_name: jellyfin
