@@ -14,7 +14,7 @@ services:
     image: ghcr.io/casudo/hevy-insights-frontend:v1.8.6@sha256:c91f6a63da07c67779acaf4ba5143958e398f9758fe8d1b1a5953a34ceb01283
     restart: unless-stopped
     ports:
-      - 8123:8080
+      - ${HOST_IP}:8123:8080
     depends_on:
       - backend
     security_opt:
