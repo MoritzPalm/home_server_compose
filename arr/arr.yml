@@ -38,7 +38,7 @@ services:
       gluetun:
         condition: service_healthy
     ports: 
-      - 8989:8989
+      - ${HOST_IP}:8989:8989
     environment:
       - PUID=1000
       - PGID=1000
@@ -72,7 +72,7 @@ services:
       gluetun:
         condition: service_healthy
     ports: 
-      - 7878:7878
+      - ${HOST_IP}:7878:7878
     environment:
       - PUID=1000
       - PGID=1000
@@ -106,7 +106,7 @@ services:
       gluetun:
         condition: service_healthy
     ports:
-      - 8686:8686
+      - ${HOST_IP}:8686:8686
     environment:
       - PUID=1000
       - PGID=1000
@@ -165,12 +165,12 @@ services:
     cap_add: # docker drops all cap execpt added 
       - NET_ADMIN
     ports:
-      - 8088:8088 # qbittorrent http web ui
-      - 5030:5030 # soulseek web ui
-      - 5031:5031 # soulseek https web ui
-      - 9696:9696 # prowlarr web ui
-      - 8191:8191 # flaresolverr web ui
-      - 5010:5010 # Mousehole port
+      - ${HOST_IP}:8088:8088 # qbittorrent http web ui
+      - ${HOST_IP}:5030:5030 # soulseek web ui
+      - ${HOST_IP}:5031:5031 # soulseek https web ui
+      - ${HOST_IP}:9696:9696 # prowlarr web ui
+      - ${HOST_IP}:8191:8191 # flaresolverr web ui
+      - ${HOST_IP}:5010:5010 # Mousehole port
     healthcheck:
       test: ping -c 1 www.google.com || exit 1
       interval: 30s
@@ -244,7 +244,7 @@ services:
       gluetun:
         condition: service_healthy
     ports:
-      - 5055:5055
+      - ${HOST_IP}:5055:5055
     environment:
       - LOG_LEVEL=debug
       - TZ=Europe/Berlin
@@ -278,7 +278,7 @@ services:
       gluetun:
         condition: service_healthy
     ports:
-      - 6767:6767
+      - ${HOST_IP}:6767:6767
     environment:
       - PUID=1000
       - PGID=1000
@@ -315,7 +315,7 @@ services:
       gluetun:
         condition: service_healthy
     ports:
-      - 6969:6969
+      - ${HOST_IP}:6969:6969
     environment:
       - PUID=1000
       - PGID=1000
@@ -389,7 +389,7 @@ services:
     image: santiagosayshey/profilarr:v1.1.5@sha256:8033e9c6d6995f37625afeb93d7020e99566f549ae83b65f1db7e11048952d0f
     container_name: profilarr
     ports:
-      - 6868:6868
+      - ${HOST_IP}:6868:6868
     volumes:
       - ${CONFIG_PATH}/profilarr:/config
     environment:
@@ -423,7 +423,7 @@ services:
       - PGID=1000
       - UMASK=002
     ports:
-      - 8787:8787
+      - ${HOST_IP}:8787:8787
     volumes:
       - ${CONFIG_PATH}/bookshelf:/config
       - ${STORAGE_PATH}:/data
@@ -450,7 +450,7 @@ services:
     container_name: audiobookrequest
     user: "1000:1000"
     ports: 
-      - 8000:8000
+      - ${HOST_IP}:8000:8000
     volumes: 
       - ${CONFIG_PATH}/audiobookrequest:/config
     environment:
@@ -483,7 +483,7 @@ services:
     container_name: cross-seed
     user: "1000:1000"
     ports:
-      - "2468:2468"
+      - ${HOST_IP}:2468:2468
     volumes:
       - ${CONFIG_PATH}/cross-seed:/config
       - ${STORAGE_PATH}:/data

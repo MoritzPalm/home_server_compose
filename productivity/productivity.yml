@@ -11,7 +11,7 @@ services:
       VIKUNJA_DATABASE_DATABASE: vikunja
       VIKUNJA_SERVICE_SECRET: ${VIKUNJA_JWT_SECRET}
     ports:
-      - 3456:3456
+      - ${HOST_IP}:3456:3456
     volumes:
       - ${DATABASE_DIR}/vikunja-files:/app/vikunja/files
     security_opt:

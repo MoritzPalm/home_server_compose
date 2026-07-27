@@ -23,7 +23,7 @@ services:
       - no-new-privileges:true
     restart: unless-stopped
     ports:
-      - 3123:3123
+      - ${HOST_IP}:3123:3123
     #command: [sh, -c, "cp -n /app/config/tpl/*.yaml /app/config && node server.js"]
     networks:
       - internal
