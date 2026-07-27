@@ -14,16 +14,25 @@ services:
     networks:
       - media_network
     ports:
+       # The ONE deliberately internet-facing port on this host that is not
+       # behind Traefik. Left unbound on purpose: it must answer both on the
+       # DNAT'd IPv4 and on the host's public IPv6, and there is no NAT on v6 to
+       # rewrite the destination to ${LAN_IP}. Binding this to ${LAN_IP} would
+       # silently kill IPv6 remote access.
+       # Access control for it lives in the firewall role's DOCKER-USER chain
+       # (allow tcp/32400 — the CONTAINER port, post-DNAT), not here.
        - 32401:32400/tcp
-       - 32401:32400/udp    
-       - 3005:3005/tcp
-       - 8324:8324/tcp
-       - 32469:32469/tcp
-       - 1900:1900/udp
-       - 32410:32410/udp
-       - 32412:32412/udp
-       - 32413:32413/udp
-       - 32414:32414/udp
+       # Everything below is LAN-only: discovery, DLNA and companion ports have
+       # no business being routable, and none are needed for remote access.
+       - ${LAN_IP}:32401:32400/udp
+       - ${LAN_IP}:3005:3005/tcp
+       - ${LAN_IP}:8324:8324/tcp
+       - ${LAN_IP}:32469:32469/tcp
+       - ${LAN_IP}:1900:1900/udp
+       - ${LAN_IP}:32410:32410/udp
+       - ${LAN_IP}:32412:32412/udp
+       - ${LAN_IP}:32413:32413/udp
+       - ${LAN_IP}:32414:32414/udp
     devices:
       - "/dev/dri:/dev/dri" # Binds the Intel Quicksync decoder to Plex HW Transcode
     volumes:
@@ -53,9 +62,9 @@ services:
     networks:
       - media_network
     ports:
-      - "8008:8008"      # Main web app
-      - "8888:8888"      # Spotify OAuth callback
-      - "8889:8889"      # Tidal OAuth callback
+      - ${HOST_IP}:8008:8008      # Main web app
+      - ${HOST_IP}:8888:8888      # Spotify OAuth callback
+      - ${HOST_IP}:8889:8889      # Tidal OAuth callback
     volumes:
       - ${CONFIG_PATH}/soulsync:/app/config
       - ${LOG_DIR}/soulsync:/app/logs
@@ -101,7 +110,7 @@ services:
     networks:
       - media_network
     ports:
-      - "9078:9078"      # Web UI + Spotify OAuth callback + Plex webhook target
+      - ${HOST_IP}:9078:9078      # Web UI + Spotify OAuth callback + Plex webhook target
     volumes:
       - ${CONFIG_PATH}/multi-scrobbler:/config
     restart: unless-stopped
@@ -127,9 +136,11 @@ services:
     networks:
       - media_network
     ports:
-      - 8096:8096       # HTTP web UI
-      - 8920:8920       # HTTPS web UI
-      - 7359:7359/udp   # Client auto-discovery
+      - ${LAN_IP}:8096:8096
+      - ${HOST_IP}:8096:8096   # HTTP web UI (LAN + tailnet)
+      - ${LAN_IP}:8920:8920
+      - ${HOST_IP}:8920:8920   # HTTPS web UI (LAN + tailnet)
+      - ${LAN_IP}:7359:7359/udp   # Client auto-discovery
     devices:
       - "/dev/dri:/dev/dri"  # Intel Quicksync for HW transcode (shared with Plex)
     environment:
@@ -163,7 +174,7 @@ services:
       - media_network
       - arr
     ports:
-      - 9999:9999
+      - ${HOST_IP}:9999:9999
     environment:
       - TZ=Europe/Berlin
       - STASH_STASH=/data/xxx/
@@ -207,7 +218,7 @@ services:
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
     ports:
-      - 2283:2283
+      - ${HOST_IP}:2283:2283
     depends_on:
       - redis
       - database
