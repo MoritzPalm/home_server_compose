@@ -310,7 +310,7 @@ services:
 
   whisparr:
     container_name: whisparr
-    image: ghcr.io/hotio/whisparr:v3@sha256:34653e1cf10b99532b56f8afecbca449d32bf460b2b03990b7ecff898e789c13
+    image: ghcr.io/hotio/whisparr:v3@sha256:93db4f70e19bb8f8dfa8860f8ef6b3bc3102e21089764d1e3cdbc04b6c901714
     depends_on:
       gluetun:
         condition: service_healthy
