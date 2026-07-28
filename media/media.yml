@@ -99,7 +99,8 @@ services:
       # external base URL — used to build the Spotify OAuth redirect and the
       # Plex webhook URL shown in the UI. Must match the Spotify app redirect.
       - BASE_URL=http://${HOST_IP}:9078
-      # --- Spotify source (reads your Spotify plays) ---
+      # temoporary until traefik is configured
+      - SPOTIFY_REDIRECT_URI=http://127.0.0.1:9078/callback
       - SPOTIFY_CLIENT_ID=${MS_SPOTIFY_CLIENT_ID}
       - SPOTIFY_CLIENT_SECRET=${MS_SPOTIFY_CLIENT_SECRET}
       # --- Plex source (webhook) — filter to your Plex account ---
