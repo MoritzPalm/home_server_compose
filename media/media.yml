@@ -10,7 +10,7 @@ services:
       - HOSTNAME=PLEX_SERVER
       # PLEX_CLAIM only matters on first setup; empty once the server is claimed
       - PLEX_CLAIM=${PLEX_CLAIM:-}
-      - ADVERTISE_IP=http://${LAN_IP}:32401/,http://${PUBLIC_IP}:32401/
+      - ADVERTISE_IP=http://${LAN_IP}:32401/
     networks:
       - media_network
     ports:
@@ -96,22 +96,31 @@ services:
       - TZ=Europe/Berlin
       - PUID=1000
       - PGID=1000
-      # external base URL — used to build the Spotify OAuth redirect and the
-      # Plex webhook URL shown in the UI. Must match the Spotify app redirect.
+      # external base URL — used to build UI links and the default OAuth
+      # redirect. Overridden for Spotify below.
       - BASE_URL=http://${HOST_IP}:9078
-      # temoporary until traefik is configured
-      - SPOTIFY_REDIRECT_URI=http://127.0.0.1:9078/callback
+      # --- Spotify source. SPOTIFY_ID activates the source via ENV config. ---
+      - SPOTIFY_ID=spotify
       - SPOTIFY_CLIENT_ID=${MS_SPOTIFY_CLIENT_ID}
       - SPOTIFY_CLIENT_SECRET=${MS_SPOTIFY_CLIENT_SECRET}
-      # --- Plex source (webhook) — filter to your Plex account ---
-      - PLEX_USER=${MS_PLEX_USER}
-      # --- ListenBrainz target (where everything is scrobbled) ---
+      # temporary loopback redirect until traefik/https is configured; Spotify
+      # rejects http on non-loopback. Complete OAuth over an ssh -L tunnel.
+      - SPOTIFY_REDIRECT_URI=http://127.0.0.1:9078/callback
+      # --- Plex source (API polling of /status/sessions, no Plex Pass needed).
+      # PLEX_ID activates it; reaches Plex by container name on media_network. ---
+      - PLEX_ID=plex
+      - PLEX_URL=http://plex:32400
+      - PLEX_TOKEN=${MS_PLEX_TOKEN}
+      - PLEX_USERS_ALLOW=${MS_PLEX_USER}
+      # --- ListenBrainz scrobble client (target). LZE_ID activates the client;
+      # note creds use the LZ_ prefix but the id uses LZE_ (client vs source). ---
+      - LZE_ID=listenbrainz
       - LZ_TOKEN=${MS_LISTENBRAINZ_TOKEN}
       - LZ_USER=${MS_LISTENBRAINZ_USER}
     networks:
       - media_network
     ports:
-      - ${HOST_IP}:9078:9078      # Web UI + Spotify OAuth callback + Plex webhook target
+      - ${HOST_IP}:9078:9078      # Web UI + Spotify OAuth callback
     volumes:
       - ${CONFIG_PATH}/multi-scrobbler:/config
     restart: unless-stopped
