@@ -18,6 +18,7 @@ services:
       - ${CONFIG_PATH}/traefik/dynamic:/dynamic:ro
       - ${CONFIG_PATH}/traefik/acme:/acme
       - ${CONFIG_PATH}/traefik/secrets/cf_dns_token:/run/secrets/cf_dns_token:ro
+      - ${CONFIG_PATH}/traefik/secrets/crowdsec_lapi_key:/run/secrets/crowdsec_lapi_key:ro
       - ${LOG_DIR}/traefik:/var/log/traefik
     networks:
       - external
@@ -56,6 +57,31 @@ services:
       - internal
     security_opt:
       - no-new-privileges:true
+
+  
+  crowdsec:
+    image: crowdsecurity/crowdsec:v1.7.8@sha256:2f527c9bb8b367120eb08b82890aa912ce96bfa1ada93dda0721700e4b4e0dde
+    container_name: crowdsec
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Berlin
+      - COLLECTIONS=${CROWDSEC_COLLECTIONS}
+      - BOUNCER_KEY_traefik=${CROWDSEC_BOUNCER_KEY}
+    volumes:
+      - ${CONFIG_PATH}/crowdsec/config:/etc/crowdsec
+      - ${CONFIG_PATH}/crowdsec/data:/var/lib/crowdsec/data
+      - ${CONFIG_PATH}/crowdsec/acquis.d:/etc/crowdsec/acquis.d:ro
+      - ${LOG_DIR}/traefik:/var/log/traefik:ro
+    networks:
+      - internal
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "cscli", "lapi", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
 networks:
   external:
