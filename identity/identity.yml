@@ -22,6 +22,8 @@ services:
     volumes:
       - ${CONFIG_PATH}/authentik/media:/media
       - ${CONFIG_PATH}/authentik/templates:/templates
+      # read-only: authentik only reads blueprints, all state lives in postgres
+      - ${CONFIG_PATH}/authentik/blueprints:/blueprints/custom:ro
     networks:
       - identity
       - external
@@ -73,6 +75,7 @@ services:
     volumes:
       - ${CONFIG_PATH}/authentik/media:/media
       - ${CONFIG_PATH}/authentik/templates:/templates
+      - ${CONFIG_PATH}/authentik/blueprints:/blueprints/custom:ro
     networks:
       - identity
     security_opt:
