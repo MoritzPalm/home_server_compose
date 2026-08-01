@@ -14,6 +14,7 @@ services:
       - ${HOST_IP}:3456:3456
     volumes:
       - ${DATABASE_DIR}/vikunja-files:/app/vikunja/files
+      - ${CONFIG_PATH}/vikunja/config.yml:/etc/vikunja/config.yml:ro
     security_opt:
       - no-new-privileges:true
     depends_on:
