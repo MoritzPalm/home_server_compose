@@ -263,12 +263,19 @@ services:
     networks:
       - arr
       - media_network
+      - external
     labels:
       - "homepage.group=Requests"
       - "homepage.name=Overseerr"
       - "homepage.icon=overseerr"
       - "homepage.href=http://${HOST_IP}:5055"
       - "homepage.description=Media requests"
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.overseerr.rule=Host(`${HOST_OVERSEERR}`)"
+      - "traefik.http.routers.overseerr.entrypoints=tunnel"
+      - "traefik.http.routers.overseerr.middlewares=chain-public@file"
+      - "traefik.http.services.overseerr.loadbalancer.server.port=5055"
 
 
   bazarr:
@@ -498,6 +505,8 @@ services:
 
 
 networks:
+  external:
+    external: true
   arr:
     external: true
   media_network:

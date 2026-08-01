@@ -42,7 +42,8 @@ services:
       - POSTGRES_PASSWORD=${RECIPES_DB_PASSWORD}
       
       - SECRET_KEY=${RECIPES_SECRET_KEY}
-      - ALLOWED_HOSTS=${RECIPES_ALLOWED_HOSTS:-*}
+      - ALLOWED_HOSTS=${HOST_TANDOOR},${HOST_IP}
+      - CSRF_TRUSTED_ORIGINS=https://${HOST_TANDOOR}
       
       - TZ=${TZ:-Europe/Berlin}
     volumes:
@@ -74,8 +75,24 @@ services:
       - "homepage.icon=tandoor"
       - "homepage.href=http://${HOST_IP}:9815"
       - "homepage.description=Recipe manager"
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.tandoor.rule=Host(`${HOST_TANDOOR}`)"
+      - "traefik.http.routers.tandoor.entrypoints=tunnel"
+      - "traefik.http.routers.tandoor.middlewares=chain-public@file"
+      - "traefik.http.services.tandoor.loadbalancer.server.port=80"
 
   
+    networks:
+      # 'default' keeps the link to the db/backend in this stack;
+      # 'external' is only for Traefik to reach this container.
+      - default
+      - external
 volumes:
   recipes_staticfiles:
     driver: local
+
+networks:
+  default:
+  external:
+    external: true

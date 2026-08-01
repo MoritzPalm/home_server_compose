@@ -3,7 +3,7 @@ services:
     image: vikunja/vikunja:2.4.0@sha256:1a5dd2d410b5359f689c77bbd1c66742cde1993f82d4adfe9aefa400ff1dd833
     container_name: vikunja
     environment:
-      VIKUNJA_SERVICE_PUBLICURL: http://${HOST_IP}:3456
+      VIKUNJA_SERVICE_PUBLICURL: https://${HOST_VIKUNJA}
       VIKUNJA_DATABASE_HOST: db
       VIKUNJA_DATABASE_PASSWORD: ${VIKUNJA_POSTGRES_PASSWORD}
       VIKUNJA_DATABASE_TYPE: postgres
@@ -26,6 +26,17 @@ services:
       - "homepage.icon=vikunja"
       - "homepage.href=http://${HOST_IP}:3456"
       - "homepage.description=Task manager"
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.vikunja.rule=Host(`${HOST_VIKUNJA}`)"
+      - "traefik.http.routers.vikunja.entrypoints=tunnel"
+      - "traefik.http.routers.vikunja.middlewares=chain-public@file"
+      - "traefik.http.services.vikunja.loadbalancer.server.port=3456"
+    networks:
+      # 'default' keeps the link to the db/backend in this stack;
+      # 'external' is only for Traefik to reach this container.
+      - default
+      - external
   db:
     image: postgres:17@sha256:0af65001d05296a2ead57ac4a6412433d8913d1bb5d0c88435a7d1e1ee5cb04b
     container_name: vikunja_db
@@ -41,3 +52,8 @@ services:
       test: ["CMD-SHELL", "pg_isready -h localhost -U $$POSTGRES_USER"]
       interval: 2s
       start_period: 30s
+
+networks:
+  default:
+  external:
+    external: true
