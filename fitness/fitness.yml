@@ -26,3 +26,19 @@ services:
       - "homepage.icon=hevy"
       - "homepage.href=http://${HOST_IP}:8123"
       - "homepage.description=Workout analytics"
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.hevy.rule=Host(`${HOST_HEVY}`)"
+      - "traefik.http.routers.hevy.entrypoints=tunnel"
+      - "traefik.http.routers.hevy.middlewares=chain-sso@file"
+      - "traefik.http.services.hevy.loadbalancer.server.port=8080"
+    networks:
+      # 'default' keeps the link to the db/backend in this stack;
+      # 'external' is only for Traefik to reach this container.
+      - default
+      - external
+
+networks:
+  default:
+  external:
+    external: true
