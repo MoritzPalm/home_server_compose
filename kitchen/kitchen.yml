@@ -42,7 +42,7 @@ services:
       - POSTGRES_PASSWORD=${RECIPES_DB_PASSWORD}
       
       - SECRET_KEY=${RECIPES_SECRET_KEY}
-      - ALLOWED_HOSTS=${HOST_TANDOOR},${HOST_IP}
+      - ALLOWED_HOSTS=${HOST_TANDOOR},${HOST_IP},localhost
       - CSRF_TRUSTED_ORIGINS=https://${HOST_TANDOOR}
       - SOCIAL_PROVIDERS=allauth.socialaccount.providers.openid_connect
       - SOCIALACCOUNT_PROVIDERS={"openid_connect":{"APPS":[{"provider_id":"authentik","name":"Authentik","client_id":"tandoor","secret":"${OIDC_TANDOOR_SECRET}","settings":{"server_url":"https://${HOST_AUTHENTIK}/application/o/tandoor-oidc/.well-known/openid-configuration"}}]}}
