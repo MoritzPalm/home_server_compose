@@ -41,6 +41,14 @@ services:
       - "${MEDIA_PATH}:/data/media"
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
     labels:
       - "homepage.group=Media"
       - "homepage.name=Plex"
@@ -227,10 +235,12 @@ services:
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_DATABASE_NAME=${DB_DATABASE_NAME}
+      - IMMICH_CONFIG_FILE=/config/immich.json
     volumes:
       # Do not edit the next line. If you want to change the media storage location on your system, edit the value of UPLOAD_LOCATION in the .env file
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
+      - ${CONFIG_PATH}/immich/config.json:/config/immich.json:ro
     ports:
       - ${HOST_IP}:2283:2283
     depends_on:
@@ -240,15 +250,22 @@ services:
     healthcheck:
       disable: false
     networks:
-      - media_network
+      - external
+      - immich_internal
     security_opt:
       - no-new-privileges:true
     labels:
       - "homepage.group=Media"
       - "homepage.name=Immich"
       - "homepage.icon=immich"
-      - "homepage.href=http://${HOST_IP}:2283"
+      - "homepage.href=https://${HOST_IMMICH}"
       - "homepage.description=Photo library"
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.immich.rule=Host(`${HOST_IMMICH}`)"
+      - "traefik.http.routers.immich.entrypoints=tunnel"
+      - "traefik.http.routers.immich.middlewares=chain-public@file"
+      - "traefik.http.services.immich.loadbalancer.server.port=2283"
       
       
 
@@ -269,7 +286,7 @@ services:
     healthcheck:
       disable: false
     networks:
-      - media_network
+      - immich_internal
 
   redis:
     container_name: immich_redis
@@ -280,7 +297,7 @@ services:
     security_opt:
       - no-new-privileges:true
     networks:
-     - media_network 
+      - immich_internal
 
   database:
     container_name: immich_postgres
@@ -307,7 +324,7 @@ services:
     security_opt:
       - no-new-privileges:true
     networks:
-      - media_network
+      - immich_internal
 
 
 volumes:
@@ -327,4 +344,8 @@ networks:
   media_network:
     external: true
   arr:
+    external: true
+  immich_internal:
+    driver: bridge
+  external:
     external: true
