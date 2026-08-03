@@ -1,14 +1,14 @@
-
 services:
-  broker:
+  paperless_broker:
     image: docker.io/library/redis:7@sha256:b2b95679e3b46fb51864949ed25ea976fc3a6bcc00a40a1bc00d568cb2822e50
+    container_name: paperless_broker
     restart: unless-stopped
     volumes:
-      - redisdata:/data
+      - ${CACHE_DIR}/paperless-redis:/data
     security_opt:
       - no-new-privileges:true
-    networks:
-      - paperless
+    cap_drop:
+      - ALL
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 30s
@@ -16,109 +16,135 @@ services:
       retries: 3
       start_period: 10s
 
-  db:
-    image: docker.io/library/postgres:16@sha256:be01cf82fc7dbba824acf0a82e150b4b360f3ff93c6631d7844af431e841a95c
+  paperless_db:
+    image: postgres:18-alpine@sha256:9a8afca54e7861fd90fab5fdf4c42477a6b1cb7d293595148e674e0a3181de15
+    container_name: paperless_db
     restart: unless-stopped
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - ${DATABASE_DIR}/paperless:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: paperless
-      POSTGRES_USER: paperless
-      POSTGRES_PASSWORD: ${PAPERLESS_DB_PASSWORD:-paperless}
+      POSTGRES_DB: ${PAPERLESS_DB_NAME}
+      POSTGRES_USER: ${PAPERLESS_DB_USER}
+      POSTGRES_PASSWORD: ${PAPERLESS_DB_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
     security_opt:
       - no-new-privileges:true
-    networks:
-      - paperless
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+      - DAC_OVERRIDE
+      - FOWNER
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U paperless -d paperless"]
+      test: ["CMD-SHELL", "pg_isready -U ${PAPERLESS_DB_USER} -d ${PAPERLESS_DB_NAME}"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 30s
 
-  webserver:
-    image: ghcr.io/paperless-ngx/paperless-ngx:latest@sha256:17312f00bac06f8dad09d67c6c8c069fc5c076c0c22313241c673102dfaf8ee9
+  paperless:
+    image: ghcr.io/paperless-ngx/paperless-ngx:3.0.5@sha256:65a4cabf0169ea7fbd90ab7bb28ba3f8b5909613635acda1a03ad606f34b456b
     container_name: paperless
     restart: unless-stopped
     depends_on:
-      db:
+      paperless_db:
         condition: service_healthy
-      broker:
+      paperless_broker:
         condition: service_healthy
-      gotenberg:
+      paperless_gotenberg:
         condition: service_started
-      tika:
+      paperless_tika:
         condition: service_started
+    volumes:
+      - ${CONFIG_PATH}/paperless/data:/usr/src/paperless/data
+      - ${PAPERLESS_PATH}/media:/usr/src/paperless/media
+      - ${PAPERLESS_PATH}/consume:/usr/src/paperless/consume
+      - ${PAPERLESS_PATH}/export:/usr/src/paperless/export
+    environment:
+      PAPERLESS_REDIS: redis://paperless_broker:6379
+      PAPERLESS_DBHOST: paperless_db
+      PAPERLESS_DBNAME: ${PAPERLESS_DB_NAME}
+      PAPERLESS_DBUSER: ${PAPERLESS_DB_USER}
+      PAPERLESS_DBPASS: ${PAPERLESS_DB_PASSWORD}
+      PAPERLESS_SECRET_KEY: ${PAPERLESS_SECRET_KEY}
+
+      PAPERLESS_URL: https://${HOST_PAPERLESS}
+      PAPERLESS_CSRF_TRUSTED_ORIGINS: https://${HOST_PAPERLESS}
+      # localhost is required by the healthcheck below. Omitting it makes the
+      # container permanently unhealthy, and Traefik silently skips unhealthy
+      # containers rather than reporting an error.
+      PAPERLESS_ALLOWED_HOSTS: ${HOST_PAPERLESS},localhost
+
+      PAPERLESS_TIME_ZONE: ${TZ:-Europe/Berlin}
+      PAPERLESS_OCR_LANGUAGE: deu+eng
+      PAPERLESS_OCR_LANGUAGES: deu eng
+      PAPERLESS_OCR_USER_ARGS: '{"invalidate_digital_signatures": true, "continue_on_soft_render_error": true}'
+
+      PAPERLESS_TIKA_ENABLED: 1
+      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://paperless_gotenberg:3000
+      PAPERLESS_TIKA_ENDPOINT: http://paperless_tika:9998
+
+      # Files are written as this uid/gid, which must match the ownership
+      # Ansible sets on the bind-mounted directories.
+      USERMAP_UID: 1000
+      USERMAP_GID: 1000
+
+      # Bootstraps the first superuser. Applied only when no user exists yet.
+      PAPERLESS_ADMIN_USER: ${PAPERLESS_ADMIN_USER}
+      PAPERLESS_ADMIN_PASSWORD: ${PAPERLESS_ADMIN_PASSWORD}
+
+      # OIDC via django-allauth. Paperless keeps its own login, which the mobile
+      # app needs; forward-auth would break it.
+      PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
+      PAPERLESS_SOCIALACCOUNT_PROVIDERS: '{"openid_connect":{"APPS":[{"provider_id":"authentik","name":"Authentik","client_id":"paperless","secret":"${OIDC_PAPERLESS_SECRET}","settings":{"server_url":"https://${HOST_AUTHENTIK}/application/o/paperless-oidc/.well-known/openid-configuration"}}]}}'
+      PAPERLESS_SOCIAL_AUTO_SIGNUP: "true"
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
-      # probe the app directly on its internal port; going through a host IP
-      # tests the port mapping of whatever machine this used to run on
       test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:8000"]
       interval: 30s
       timeout: 10s
       retries: 5
-    volumes:
-      - /media/hdd1/paperless/data:/usr/src/paperless/data
-      - /media/hdd1/paperless/media:/usr/src/paperless/media
-      - /home/moritzpalm/paperless-ngx/export:/usr/src/paperless/export
-      - /home/moritzpalm/paperless-ngx/consume:/usr/src/paperless/consume
-    env_file: stack.env
-    environment:
-      PAPERLESS_REDIS: redis://broker:6379
-      PAPERLESS_DBHOST: db
-      PAPERLESS_DBPASS: ${PAPERLESS_DB_PASSWORD:-paperless}
-      PAPERLESS_TIKA_ENABLED: 1
-      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
-      PAPERLESS_TIKA_ENDPOINT: http://tika:9998
-      PAPERLESS_OCR_USER_ARGS: '{"invalidate_digital_signatures": true, "continue_on_soft_render_error": true}'
-    security_opt:
-       - no-new-privileges:true 
+      start_period: 120s
     labels:
-      - "traefik.enable=true"
-
-      - "traefik.http.routers.paperless.entrypoints=websecure"
-      - "traefik.http.routers.paperless.rule=Host(`paperless.local.moritzpalm.com`)"
-      - "traefik.http.routers.paperless.tls=true"
-      - "traefik.http.routers.paperless.service=paperless"
-      - "traefik.http.services.paperless.loadbalancer.server.port=80"
-      - "traefik.docker.network=internal"
       - "homepage.group=Documents"
       - "homepage.name=Paperless"
       - "homepage.icon=paperless-ngx"
-      - "homepage.href=https://paperless.local.moritzpalm.com"
+      - "homepage.href=https://${HOST_PAPERLESS}"
       - "homepage.description=Document archive"
-    ports:
-      - 8001:8000
-    
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.paperless.rule=Host(`${HOST_PAPERLESS}`)"
+      - "traefik.http.routers.paperless.entrypoints=tunnel"
+      - "traefik.http.routers.paperless.middlewares=chain-public@file"
+      - "traefik.http.services.paperless.loadbalancer.server.port=8000"
     networks:
-      - paperless
-      - internal
+      - default
+      - external
 
-  gotenberg:
-    image: docker.io/gotenberg/gotenberg:7.10@sha256:d03b8a04c6e6c5e568b38f57352266dee4674849b71818774025f8f48d869a9a
+  paperless_gotenberg:
+    image: docker.io/gotenberg/gotenberg:8.34.0@sha256:67097317623a503ba2a6a7e9ae8db6929a1f7e1bbd88077bacf2d325fbdab923
+    container_name: paperless_gotenberg
     restart: unless-stopped
-
-    # The gotenberg chromium route is used to convert .eml files. We do not
-    # want to allow external content like tracking pixels or even javascript.
+    # The chromium route converts .eml files. External content, including
+    # tracking pixels and javascript, must not be fetched.
     command:
       - "gotenberg"
       - "--chromium-disable-javascript=true"
       - "--chromium-allow-list=file:///tmp/.*"
-    networks:
-      - paperless
+    security_opt:
+      - no-new-privileges:true
 
-  tika:
-    image: docker.io/apache/tika:latest@sha256:90b7fa1dc018434075fce9e1d9b88b1e3d0ea6979d0cf86e116c79a8073ae973
+  paperless_tika:
+    image: docker.io/apache/tika:3.3.1.0@sha256:90b7fa1dc018434075fce9e1d9b88b1e3d0ea6979d0cf86e116c79a8073ae973
+    container_name: paperless_tika
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
-    networks:
-      - paperless
-
-volumes:
-  pgdata:
-  redisdata:
 
 networks:
-  paperless:
-  internal:
+  default:
+  external:
     external: true
