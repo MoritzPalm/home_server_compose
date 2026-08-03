@@ -93,6 +93,7 @@ services:
       - ${CONFIG_PATH}/cloudflared:/etc/cloudflared:ro
     networks:
       - external
+      - internal
     security_opt:
       - no-new-privileges:true
     cap_drop:
