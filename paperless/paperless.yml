@@ -5,6 +5,11 @@ services:
     restart: unless-stopped
     volumes:
       - ${CACHE_DIR}/paperless-redis:/data
+    # Starts directly as the redis uid. The entrypoint's chown of /data is
+    # gated on running as root, so this skips it entirely — which is required
+    # here: with cap_drop ALL root has no DAC_OVERRIDE and cannot traverse the
+    # 0750 data directory, and the container crash-loops on "Permission denied".
+    user: "999:999"
     security_opt:
       - no-new-privileges:true
     cap_drop:
