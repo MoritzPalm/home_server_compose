@@ -12,7 +12,7 @@ services:
     networks:
       - media_network
     ports:
-       - 32401:32400/tcp
+       - 32400:32400/tcp
        - ${LAN_IP}:32401:32400/udp
        - ${LAN_IP}:3005:3005/tcp
        - ${LAN_IP}:8324:8324/tcp
