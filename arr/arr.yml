@@ -236,6 +236,23 @@ services:
       - "homepage.href=http://${HOST_IP}:8088"
       - "homepage.description=Torrent client"
 
+  # keeps myanonamouse/torrentleech torrents force-resumed (bypassing queueing limits)
+  # so seeding points/ratio keep accruing even once qbittorrent's queueing is enabled
+  qbit-force-seed:
+    image: python:3.12-alpine@sha256:6d43704baacd1bfbe7c295d7f13079d5d8104ed33568873133f8fc69980419df
+    container_name: qbit-force-seed
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    networks:
+      - arr
+    volumes:
+      - ./scripts/force_seed_private_trackers.py:/force_seed_private_trackers.py:ro
+    command: ["python3", "/force_seed_private_trackers.py"]
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
   overseerr:
     image: sctx/overseerr:1.35.0@sha256:6197516c9d7b58ccf113455e32aafb94df5d91995fe50e8c2cae6ba6c7c7b7de
     container_name: overseerr
