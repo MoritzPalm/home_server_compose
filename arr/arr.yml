@@ -350,8 +350,8 @@ services:
     restart: unless-stopped
 
   mousehole:
-    # digest-pinned (single-maintainer image); bump deliberately when WUD flags it
     image: tmmrtn/mousehole:0.5.0@sha256:2fc02b12362581e60bfd6adba788bda9eda93f8f31ed089581eeabcee4518b0d
+    container_name: mousehole
     network_mode: "service:gluetun"
     environment:
       TZ: Europe/Berlin
