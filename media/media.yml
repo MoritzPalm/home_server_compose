@@ -8,22 +8,11 @@ services:
       - TZ=Europe/Berlin
       - VERSION=docker
       - HOSTNAME=PLEX_SERVER
-      # PLEX_CLAIM only matters on first setup; empty once the server is claimed
       - PLEX_CLAIM=${PLEX_CLAIM:-}
-      - ADVERTISE_IP=http://${LAN_IP}:32401/
     networks:
       - media_network
     ports:
-       # The ONE deliberately internet-facing port on this host that is not
-       # behind Traefik. Left unbound on purpose: it must answer both on the
-       # DNAT'd IPv4 and on the host's public IPv6, and there is no NAT on v6 to
-       # rewrite the destination to ${LAN_IP}. Binding this to ${LAN_IP} would
-       # silently kill IPv6 remote access.
-       # Access control for it lives in the firewall role's DOCKER-USER chain
-       # (allow tcp/32400 — the CONTAINER port, post-DNAT), not here.
        - 32401:32400/tcp
-       # Everything below is LAN-only: discovery, DLNA and companion ports have
-       # no business being routable, and none are needed for remote access.
        - ${LAN_IP}:32401:32400/udp
        - ${LAN_IP}:3005:3005/tcp
        - ${LAN_IP}:8324:8324/tcp
