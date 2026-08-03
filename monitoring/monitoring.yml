@@ -40,6 +40,7 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+      - internal
     labels:
       - "homepage.group=Monitoring"
       - "homepage.name=Prometheus"
@@ -55,11 +56,13 @@ services:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro,rslave
+      - ${TEXTFILE_DIR}:/textfile:ro
     command:
       - '--path.procfs=/host/proc'
       - '--path.sysfs=/host/sys'
       - '--path.rootfs=/rootfs'
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+      - '--collector.textfile.directory=/textfile'
     ports:
       - ${HOST_IP}:9100:9100
     networks:
@@ -272,6 +275,7 @@ services:
     volumes:
       - ${CONFIG_PATH}/promtail/promtail.yml:/etc/promtail/config.yml:ro
       - ${DATABASE_DIR}/promtail:/positions
+      - ${LOG_DIR}/traefik:/var/log/traefik:ro
     command: -config.file=/etc/promtail/config.yml
     security_opt:
       - no-new-privileges:true
@@ -283,4 +287,6 @@ services:
 networks:
   monitoring:
     driver: bridge
+  internal:
+    external: true
 

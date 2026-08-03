@@ -31,6 +31,7 @@ services:
     networks:
       - identity
       - external
+      - internal
     security_opt:
       - no-new-privileges:true
     healthcheck:
@@ -119,4 +120,6 @@ networks:
   identity:
     driver: bridge
   external:
+    external: true
+  internal:
     external: true
