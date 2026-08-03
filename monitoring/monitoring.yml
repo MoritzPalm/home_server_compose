@@ -200,10 +200,6 @@ services:
     networks:
       - monitoring
 
-  # watchtower removed: containrrr/watchtower is unmaintained (last release
-  # 2023) and its bundled Docker client (API 1.25) is rejected by the daemon
-  # (min 1.40). We no longer auto-apply updates — WUD below detects updates and
-  # notifies, and updates are applied deliberately by re-running the playbook.
 
   # Read-only, POST-blocking proxy in front of the docker socket. A :ro socket
   # bind does NOT make the docker API read-only (POST still works through it),
