@@ -228,7 +228,7 @@ services:
       - monitoring
 
   whatsupdocker:
-    image: getwud/wud:8.2.2@sha256:2df7cafa0fc84cdd66ad976163abc5390fa5995e0b5788a90e6a5303706bc21a
+    image: getwud/wud:8.3.1@sha256:42554d2cd50d5de7a47563170bd0629193dd1e086a1fd71d1ec10fc4c2409f5d
     container_name: wud
     depends_on:
       - dockerproxy
