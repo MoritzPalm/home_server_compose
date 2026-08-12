@@ -100,7 +100,7 @@ services:
       - "homepage.description=Movies"
 
   lidarr:
-    image: linuxserver/lidarr:latest@sha256:94a876d1581f2ae5af5b846320d5f6f7a102a4755939ce0b43b01c60f9f86056
+    image: linuxserver/lidarr:latest@sha256:60be9a1faad3dfba5a711163fc18526845e2ce7b50b463dd9effae7f766c9beb
     container_name: lidarr    
     depends_on:
       gluetun:
