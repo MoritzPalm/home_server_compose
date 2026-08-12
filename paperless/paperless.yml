@@ -1,7 +1,7 @@
 
 services:
   broker:
-    image: docker.io/library/redis:7@sha256:b2b95679e3b46fb51864949ed25ea976fc3a6bcc00a40a1bc00d568cb2822e50
+    image: docker.io/library/redis:8@sha256:344e3945a0b431c8ff1eecd58c5573538126bd756f02fc7e218ddf1fc2546366
     restart: unless-stopped
     volumes:
       - redisdata:/data
