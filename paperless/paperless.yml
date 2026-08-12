@@ -17,7 +17,7 @@ services:
       start_period: 10s
 
   db:
-    image: docker.io/library/postgres:16@sha256:be01cf82fc7dbba824acf0a82e150b4b360f3ff93c6631d7844af431e841a95c
+    image: docker.io/library/postgres:18@sha256:a02db8cac496f15b094798a38254f14d6e00741f709360e5e00bb6668ea31636
     restart: unless-stopped
     volumes:
       - pgdata:/var/lib/postgresql/data
