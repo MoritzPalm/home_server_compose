@@ -71,8 +71,6 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
-    cap_add:
-      - SYS_TIME
     restart: unless-stopped
 
 
@@ -118,7 +116,6 @@ services:
       - ${HOST_IP}:8082:8080
     volumes:
       - /:/rootfs:ro
-      - /var/run:/var/run:ro
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
     devices:
@@ -191,14 +188,21 @@ services:
   smartctl-exporter:
     image: prometheuscommunity/smartctl-exporter:v0.14.0@sha256:cfe22c36d7d2fac48ebf619707305acb65eb0fb670656eb80f356e606d782bc1
     container_name: smartctl-exporter
-    privileged: true
     user: root
     command:
       - '--web.listen-address=:9902'
     ports:
       - "${HOST_IP}:9902:9902"
+    volumes:
+      - /dev:/dev
+    device_cgroup_rules:
+      - 'b *:* rwm'
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - SYS_RAWIO
     restart: unless-stopped
     networks:
       - monitoring

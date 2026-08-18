@@ -12,18 +12,17 @@
   },
   "packageRules": [
     {
-      "description": "Auto tier: stateless apps auto-merge safe updates (pin/digest/patch/minor). Majors still fall through to the major rule below.",
+      "description": "Auto tier: stateless apps auto-merge only pin/digest/patch. Minor bumps are excluded deliberately — this repo is public and is cloned straight onto the server, so an auto-merged PR is unreviewed code reaching production. A patch is a small enough diff to audit after the fact; a minor is not. Minors and majors fall through to the rules below.",
       "matchManagers": ["docker-compose"],
-      "matchUpdateTypes": ["pin", "digest", "patch", "minor"],
+      "matchUpdateTypes": ["pin", "digest", "patch"],
       "automerge": true
     },
     {
-      "description": "0.x images: a minor bump (0.y) can be breaking under semver, so review it by hand instead of auto-merging. Patches still auto-merge.",
+      "description": "Minor bumps get a normal PR and a manual merge. Under semver a minor is additive, but for container images it routinely carries new default config, new required env vars and occasionally a migration.",
       "matchManagers": ["docker-compose"],
-      "matchCurrentVersion": "/^v?0\\./",
       "matchUpdateTypes": ["minor"],
       "automerge": false,
-      "addLabels": ["update/0x-minor"]
+      "addLabels": ["update/minor"]
     },
     {
       "description": "Major versions are never auto-merged: open a PR only after I approve it on the dependency dashboard.",

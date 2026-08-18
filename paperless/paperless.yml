@@ -105,6 +105,7 @@ services:
       PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
       PAPERLESS_SOCIALACCOUNT_PROVIDERS: '{"openid_connect":{"APPS":[{"provider_id":"authentik","name":"Authentik","client_id":"paperless","secret":"${OIDC_PAPERLESS_SECRET}","settings":{"server_url":"https://${HOST_AUTHENTIK}/application/o/paperless-oidc/.well-known/openid-configuration"}}]}}'
       PAPERLESS_SOCIAL_AUTO_SIGNUP: "true"
+      PAPERLESS_DISABLE_REGULAR_LOGIN: "true"
     security_opt:
       - no-new-privileges:true
     healthcheck:

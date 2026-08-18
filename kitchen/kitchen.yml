@@ -48,7 +48,17 @@ services:
       - SOCIALACCOUNT_PROVIDERS={"openid_connect":{"APPS":[{"provider_id":"authentik","name":"Authentik","client_id":"tandoor","secret":"${OIDC_TANDOOR_SECRET}","settings":{"server_url":"https://${HOST_AUTHENTIK}/application/o/tandoor-oidc/.well-known/openid-configuration"}}]}}
       - SOCIALACCOUNT_EMAIL_AUTHENTICATION=1
       - SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT=1
-      
+      # Without these a first-time OIDC user gets an account with no space and
+      # is dropped on the "create a space" onboarding, ending up with an empty
+      # private cookbook. authentik already restricts the tandoor application to
+      # the 'family' group, so joining the existing space is the safe default.
+      - SOCIAL_DEFAULT_ACCESS=1
+      - SOCIAL_DEFAULT_GROUP=user
+
+      # USDA FoodData Central, used to look up food properties (kcal, protein,
+      # fat, carbs). The built-in DEMO_KEY is capped at 30 requests/hour.
+      - FDC_API_KEY=${FDC_API_KEY:-DEMO_KEY}
+
       - TZ=${TZ:-Europe/Berlin}
     volumes:
       - recipes_staticfiles:/opt/recipes/staticfiles
