@@ -422,69 +422,75 @@ services:
       - "homepage.href=http://${HOST_IP}:6868"
       - "homepage.description=Quality profiles"
 
-  bookshelf:
-    image: ghcr.io/pennydreadful/bookshelf:hardcover@sha256:388eecc94362580eae31ee0a454be6af516f8a311f8432a521c202fb475f4359
-    container_name: bookshelf
+  chaptarr:
+    image: chaptarr/chaptarr:0.9.929@sha256:2f5409fad4b02386fdd57169d93f7533342eafd036357a2c2b7256df19cda7eb
+    container_name: chaptarr
     environment:
       - PUID=1000
       - PGID=1000
       - UMASK=002
+      - TZ=Europe/Berlin
     ports:
-      - ${HOST_IP}:8787:8787
+      - ${HOST_IP}:8789:8789
     volumes:
-      - ${CONFIG_PATH}/bookshelf:/config
+      - ${CONFIG_PATH}/chaptarr:/config 
       - ${STORAGE_PATH}:/data
     security_opt:
-       - no-new-privileges:true 
+       - no-new-privileges:true
     restart: unless-stopped
     networks:
       - arr
     healthcheck:
-      test: ["CMD", "curl", "--fail", "http://127.0.0.1:8787"]
+      test: ["CMD", "curl", "--fail", "http://127.0.0.1:8789/ping"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 30s
     labels:
       - "homepage.group=Books"
-      - "homepage.name=Bookshelf"
-      - "homepage.icon=bookshelf-traccar"
-      - "homepage.href=http://${HOST_IP}:8787"
-      - "homepage.description=Book tracker"
+      - "homepage.name=Chaptarr"
+      - "homepage.icon=readarr"
+      - "homepage.href=http://${HOST_IP}:8789"
+      - "homepage.description=Books and audiobooks"
 
-  audiobookrequest:
-    image: markbeep/audiobookrequest:1.10.6@sha256:8e946fb257b48bb1c81a7af4ed690782cebb77d304aafb015e63360251d44a09
-    container_name: audiobookrequest
-    user: "1000:1000"
-    ports: 
-      - ${HOST_IP}:8000:8000
-    volumes: 
-      - ${CONFIG_PATH}/audiobookrequest:/config
+  shelfarr:
+    image: ghcr.io/pedro-revez-silva/shelfarr:0.11.3@sha256:c3599accccd7bdf4dd2f0734adeb8a2779eb3684ab000882f164f7bf92210816
+    container_name: shelfarr
     environment:
-      - ABR_APP__DEFAULT_REGION=de
-      - ABR_APP__OPENAPI_ENABLED=true
-      - ABR_APP__INIT_ROOT_USERNAME=${ABR_USERNAME}
-      - ABR_APP__INIT_ROOT_PASSWORD=${ABR_PASSWORD}
-      - ABR_APP__FORCE_LOGIN_TYPE=forms # to be changed when authentik is set up
+      - PUID=1000
+      - PGID=1000
       - TZ=Europe/Berlin
+      - SOLID_QUEUE_IN_PUMA=1
+      - RAILS_MASTER_KEY=${SHELFARR_MASTER_KEY}
+    ports:
+      - ${HOST_IP}:5056:80
+    volumes:
+      - ${CONFIG_PATH}/shelfarr:/rails/storage 
+      - ${STORAGE_PATH}:/data
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
     networks:
       - arr
+      - external
     healthcheck:
-      # wget, not curl: this image has no curl, so the check always failed.
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:8000"]
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:80/up"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 30s
+      start_period: 40s
     labels:
       - "homepage.group=Books"
-      - "homepage.name=AudioBookRequest"
-      - "homepage.icon=audiobookshelf"
-      - "homepage.href=http://${HOST_IP}:8000"
-      - "homepage.description=Audiobook requests"
+      - "homepage.name=Shelfarr"
+      - "homepage.icon=readarr"
+      - "homepage.href=http://${HOST_IP}:5056"
+      - "homepage.description=Book requests"
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.shelfarr.rule=Host(`${HOST_SHELFARR}`)"
+      - "traefik.http.routers.shelfarr.entrypoints=tunnel"
+      - "traefik.http.routers.shelfarr.middlewares=chain-public@file"
+      - "traefik.http.services.shelfarr.loadbalancer.server.port=80"
 
   cross-seed:
     image: ghcr.io/cross-seed/cross-seed:6@sha256:a1fed512261fd968c55cb03c51cff9c6620aa76a34b3b591afca95c890aa8225

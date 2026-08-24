@@ -1,0 +1,135 @@
+services:
+
+  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf:2.36.0@sha256:180acad33d69c99ed208676465d8edcb268fa46967735579a7810859885b1a8e
+    container_name: audiobookshelf
+    user: "1000:1000"
+    ports:
+      - ${HOST_IP}:13378:80
+    environment:
+      - TZ=Europe/Berlin
+    volumes:
+      - ${CONFIG_PATH}/audiobookshelf/config:/config
+      - ${CONFIG_PATH}/audiobookshelf/absdata:/metadata
+      - ${MEDIA_PATH}/audiobooks:/audiobooks
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    networks:
+      - default
+      - external
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:80/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "homepage.group=Books"
+      - "homepage.name=Audiobookshelf"
+      - "homepage.icon=audiobookshelf"
+      - "homepage.href=http://${HOST_IP}:13378"
+      - "homepage.description=Audiobooks"
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.audiobookshelf.rule=Host(`${HOST_AUDIOBOOKSHELF}`)"
+      - "traefik.http.routers.audiobookshelf.entrypoints=tunnel"
+      - "traefik.http.routers.audiobookshelf.middlewares=chain-public@file"
+      - "traefik.http.services.audiobookshelf.loadbalancer.server.port=80"
+
+  kavita:
+    image: jvmilazz0/kavita:0.9.0.2@sha256:ca6af7a18d7124d014702983c2364e485294f808c1552e9555f2595b7cda7982
+    container_name: kavita
+    user: "1000:1000"
+    ports:
+      - ${HOST_IP}:5000:5000
+    environment:
+      - TZ=Europe/Berlin
+    volumes:
+      - ${CONFIG_PATH}/kavita:/kavita/config
+      - ${MEDIA_PATH}/books:/books
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    networks:
+      - default
+      - external
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "homepage.group=Books"
+      - "homepage.name=Kavita"
+      - "homepage.icon=kavita"
+      - "homepage.href=http://${HOST_IP}:5000"
+      - "homepage.description=Ebooks"
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.kavita.rule=Host(`${HOST_KAVITA}`)"
+      - "traefik.http.routers.kavita.entrypoints=tunnel"
+      - "traefik.http.routers.kavita.middlewares=chain-public@file"
+      - "traefik.http.services.kavita.loadbalancer.server.port=5000"
+
+  bookbridge:
+    image: ghcr.io/cporcellijr/bookbridge:7.4.0@sha256:1ed2497379f639b91b3a4bf2c059e3cfaabed0c7c004a40dcc867df3d38d0d82
+    container_name: bookbridge
+    user: "1000:1000"
+    # faster-whisper OOMs during transcription without this.
+    shm_size: "2gb"
+    ports:
+      - ${HOST_IP}:5757:5757 # admin dashboard, tailnet only
+      - ${HOST_IP}:5758:5758 # kosync protocol only, published through traefik below
+    environment:
+      - TZ=Europe/Berlin
+      # Split-port mode: the dashboard stays on 5757 and only the kosync routes
+      # answer on 5758, so the publicly routed hostname cannot reach settings.
+      - KOSYNC_PORT=5758
+      - KOSYNC_ENABLED=true
+      - KOSYNC_HASH_METHOD=content # filename hashing is faster but mismatches on rename
+      - ABS_SERVER=http://audiobookshelf:80
+      - ABS_KEY=${ABS_API_KEY}
+      - BOOKBRIDGE_SECRET_KEY=${BOOKBRIDGE_SECRET_KEY}
+      - TRANSCRIPTION_PROVIDER=local
+      - WHISPER_MODEL=base
+      - WHISPER_DEVICE=cpu
+    volumes:
+      - ${CONFIG_PATH}/bookbridge:/data
+      - ${MEDIA_PATH}/books:/books:ro
+    cpus: 4
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    depends_on:
+      audiobookshelf:
+        condition: service_healthy
+    networks:
+      - default
+      - external
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:5757/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    labels:
+      - "homepage.group=Books"
+      - "homepage.name=BookBridge"
+      - "homepage.icon=audiobookshelf"
+      - "homepage.href=http://${HOST_IP}:5757"
+      - "homepage.description=Ebook/audiobook sync"
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.bookbridge.rule=Host(`${HOST_BOOKBRIDGE}`)"
+      - "traefik.http.routers.bookbridge.entrypoints=tunnel"
+      # chain-public, not chain-sso: KOReader cannot complete an authentik redirect.
+      # The kosync protocol authenticates with its own per-reader credentials, which
+      # is why only the split kosync port is routed here.
+      - "traefik.http.routers.bookbridge.middlewares=chain-public@file"
+      - "traefik.http.services.bookbridge.loadbalancer.server.port=5758"
+
+networks:
+  external:
+    external: true
