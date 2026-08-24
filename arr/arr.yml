@@ -461,7 +461,6 @@ services:
       - PGID=1000
       - TZ=Europe/Berlin
       - SOLID_QUEUE_IN_PUMA=1
-      - RAILS_MASTER_KEY=${SHELFARR_MASTER_KEY}
     ports:
       - ${HOST_IP}:5056:80
     volumes:
