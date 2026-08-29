@@ -464,7 +464,7 @@ services:
     ports:
       - ${HOST_IP}:5056:80
     volumes:
-      - ${CONFIG_PATH}/shelfarr:/rails/storage 
+      - ${CONFIG_PATH}/shelfarr:/rails/storage
       - ${STORAGE_PATH}:/data
     security_opt:
       - no-new-privileges:true

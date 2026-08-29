@@ -104,9 +104,8 @@ services:
       # rejects http on non-loopback. Complete OAuth over an ssh -L tunnel.
       - SPOTIFY_REDIRECT_URI=http://127.0.0.1:9078/callback
       # --- Plex source (API polling of /status/sessions, no Plex Pass needed).
-      # PLEX_ID activates it; reaches Plex by container name on media_network. ---
       - PLEX_ID=plex
-      - PLEX_URL=http://plex:32400
+      - PLEX_URL=${PLEX_URL}
       - PLEX_TOKEN=${MS_PLEX_TOKEN}
       - PLEX_USERS_ALLOW=${MS_PLEX_USER}
       # --- ListenBrainz scrobble client (target). LZE_ID activates the client;
