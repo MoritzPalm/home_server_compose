@@ -39,7 +39,7 @@ services:
       - default
       - external
   db:
-    image: postgres:18@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280
+    image: postgres:17@sha256:0af65001d05296a2ead57ac4a6412433d8913d1bb5d0c88435a7d1e1ee5cb04b
     container_name: vikunja_db
     environment:
       POSTGRES_PASSWORD: ${VIKUNJA_POSTGRES_PASSWORD}
