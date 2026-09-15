@@ -423,7 +423,7 @@ services:
       - "homepage.description=Quality profiles"
 
   chaptarr:
-    image: chaptarr/chaptarr:0.9.929@sha256:2f5409fad4b02386fdd57169d93f7533342eafd036357a2c2b7256df19cda7eb
+    image: chaptarr/chaptarr:0.9.958@sha256:941effc0c12c632328c1d6bb032b5e5687a87a8fbe0e37241bcf876e6d4bf868
     container_name: chaptarr
     environment:
       - PUID=1000
