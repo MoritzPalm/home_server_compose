@@ -356,6 +356,7 @@ services:
     environment:
       TZ: Europe/Berlin
       MOUSEHOLE_AUTH_PASSWORD: ${MOUSEHOLE_AUTH_PASSWORD}
+      MOUSEHOLE_ALLOWED_HOSTS: ${MOUSEHOLE_ALLOWED_HOSTS}
     volumes:
       # persist cookie data across container restarts
       - "${CONFIG_PATH}/mousehole:/srv/mousehole"
