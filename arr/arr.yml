@@ -470,7 +470,7 @@ services:
       - "traefik.http.routers.chaptarr.middlewares=chain-public@file"
 
   shelfarr:
-    image: ghcr.io/pedro-revez-silva/shelfarr:0.11.3@sha256:c3599accccd7bdf4dd2f0734adeb8a2779eb3684ab000882f164f7bf92210816
+    image: ghcr.io/pedro-revez-silva/shelfarr:0.39.7@sha256:9001e2c037947713c4c3f30d363074f9bc8415e781138ddcde2ae2f8a2ffaa0f
     container_name: shelfarr
     environment:
       - PUID=1000
