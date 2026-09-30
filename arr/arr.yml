@@ -160,7 +160,7 @@ services:
 
   # image used for vpn killswitch network
   gluetun:
-    image: qmcgaw/gluetun:latest@sha256:b0ee2135e6ba52ad3f102aae9663707cd1c9531485117067a380d3b2b6dd991d
+    image: qmcgaw/gluetun:latest@sha256:2733bb22b27e3efa7a9f2cef9057ec12791b8b225793fcd3dbfd0508404dfc25
     container_name: gluetun
     cap_add: # docker drops all cap execpt added 
       - NET_ADMIN
