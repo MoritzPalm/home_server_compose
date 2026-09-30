@@ -442,7 +442,7 @@ services:
       - arr
       - external
     healthcheck:
-      test: ["CMD", "curl", "--fail", "http://127.0.0.1:8789/ping"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:8789/ping"]
       interval: 30s
       timeout: 10s
       retries: 3
