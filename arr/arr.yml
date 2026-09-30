@@ -440,6 +440,7 @@ services:
     restart: unless-stopped
     networks:
       - arr
+      - external
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://127.0.0.1:8789/ping"]
       interval: 30s
@@ -450,8 +451,23 @@ services:
       - "homepage.group=Books"
       - "homepage.name=Chaptarr"
       - "homepage.icon=readarr"
-      - "homepage.href=http://${HOST_IP}:8789"
+      - "homepage.href=https://chaptarr.${INTERNAL_DOMAIN}"
       - "homepage.description=Books and audiobooks"
+      # Chaptarr's OIDC login only completes over HTTPS: it marks its correlation
+      # and nonce cookies Secure with SameSite=None, and a browser discards those
+      # on a plain-http origin, which fails the callback with its own
+      # "cookie_or_proxy_issue" error. So SSO goes through this router, on an
+      # internal hostname the wildcard cert already covers and the firewall never
+      # exposes. The published 8789 port stays plain http for API-key clients.
+      #
+      # No chain-sso: forward-auth in front of OIDC would mean two logins, and the
+      # authorization callback itself would require being logged in already.
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.services.chaptarr.loadbalancer.server.port=8789"
+      - "traefik.http.routers.chaptarr.rule=Host(`chaptarr.${INTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.chaptarr.entrypoints=websecure"
+      - "traefik.http.routers.chaptarr.middlewares=chain-public@file"
 
   shelfarr:
     image: ghcr.io/pedro-revez-silva/shelfarr:0.11.3@sha256:c3599accccd7bdf4dd2f0734adeb8a2779eb3684ab000882f164f7bf92210816
