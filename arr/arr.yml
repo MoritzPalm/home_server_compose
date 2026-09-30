@@ -355,6 +355,7 @@ services:
     network_mode: "service:gluetun"
     environment:
       TZ: Europe/Berlin
+      MOUSEHOLE_AUTH_PASSWORD: ${MOUSEHOLE_AUTH_PASSWORD}
     volumes:
       # persist cookie data across container restarts
       - "${CONFIG_PATH}/mousehole:/srv/mousehole"
