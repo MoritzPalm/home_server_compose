@@ -203,7 +203,7 @@ services:
 
   # image used to download stuff; run over gluetun network (vpn killswitch)
   qbittorrent:
-    image: linuxserver/qbittorrent:latest@sha256:2e074403c7b72e6d89cee3d0d41a47f7b5708c6a9e5316f3958c90765cbe12ce
+    image: linuxserver/qbittorrent:latest@sha256:b522f9f4b769f8f36d49d22d5eb6a92e9aa18904c6a1830b1439df511ec21983
     container_name: qbittorrent
     healthcheck:
       # Container may fail if the vpn's token expired, so mark as unhealthy when there is no internet connection
