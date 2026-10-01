@@ -56,12 +56,13 @@
       "addLabels": ["update/security-patch"]
     },
     {
-      "description": "Pre-1.0 book stack. Shelfarr and BookBridge ship several releases a week, so their patch bumps are not the small, safe diffs the auto tier assumes — every update gets a PR. Kavita is here for a different reason: it shipped a critical security hotfix in 2026, so its updates have to be seen rather than merged silently.",
+      "description": "Pre-1.0 book stack. Shelfarr and BookBridge ship several releases a week, so their patch bumps are not the small, safe diffs the auto tier assumes — every update gets a PR. Kavita is here for a different reason: it shipped a critical security hotfix in 2026, so its updates have to be seen rather than merged silently. Calibre-Web Automated is here because ansible writes its SQLite settings tables directly, and any release can rename a column; the provisioning task fails loudly on that, but only once the update is already running.",
       "matchManagers": ["docker-compose"],
       "matchPackageNames": [
         "/shelfarr/",
         "/bookbridge/",
-        "/kavita/"
+        "/kavita/",
+        "/calibre-web-automated/"
       ],
       "automerge": false,
       "addLabels": ["update/review"]
