@@ -56,10 +56,9 @@
       "addLabels": ["update/security-patch"]
     },
     {
-      "description": "Pre-1.0 book stack. Chaptarr is beta and Shelfarr and BookBridge ship several releases a week, so their patch bumps are not the small, safe diffs the auto tier assumes — every update gets a PR. Kavita is here for a different reason: it shipped a critical security hotfix in 2026, so its updates have to be seen rather than merged silently.",
+      "description": "Pre-1.0 book stack. Shelfarr and BookBridge ship several releases a week, so their patch bumps are not the small, safe diffs the auto tier assumes — every update gets a PR. Kavita is here for a different reason: it shipped a critical security hotfix in 2026, so its updates have to be seen rather than merged silently.",
       "matchManagers": ["docker-compose"],
       "matchPackageNames": [
-        "/chaptarr/",
         "/shelfarr/",
         "/bookbridge/",
         "/kavita/"
