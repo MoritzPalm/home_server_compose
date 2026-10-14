@@ -171,12 +171,6 @@ services:
       - ${HOST_IP}:9696:9696 # prowlarr web ui
       - ${HOST_IP}:8191:8191 # flaresolverr web ui
       - ${HOST_IP}:5010:5010 # Mousehole port
-    healthcheck:
-      test: ping -c 1 www.google.com || exit 1
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
     environment:
       # see https://github.com/qdm12/gluetun-wiki for more details
       # example envs based on https://github.com/qdm12/gluetun-wiki/blob/main/setup/providers/mullvad.md
@@ -184,11 +178,13 @@ services:
       - OPENVPN_USER=${OPENVPN_USERNAME}
       - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
       - VPN_PORT_FORWARDING=on
+      # these forward the port on their egress IP; MAM tests connectability on the announce source IP
+      - SERVER_HOSTNAMES=node-de-16.protonvpn.net,node-de-37.protonvpn.net,node-de-34.protonvpn.net,node-ch-26.protonvpn.net
       - FIREWALL_INPUT_PORTS=8088,5030,5031,9696,8191,5010
       - EXTRA_SUBNETS=192.168.178.0/24
       - FIREWALL_ALLOWED_SUBNETS=192.168.178.0/24
       - LISTENING_ADDRESS=0.0.0.0
-      - VPN_PORT_FORWARDING_UP_COMMAND=/bin/sh -c 'wget -O- --retry-connrefused --post-data "json={\"listen_port\":{{PORTS}}}" http://127.0.0.1:8088/api/v2/app/setPreferences 2>&1'
+      - VPN_PORT_FORWARDING_UP_COMMAND=/bin/sh -c 'wget -O- --tries=60 --retry-connrefused --post-data "json={\"listen_port\":{{PORTS}}}" http://127.0.0.1:8088/api/v2/app/setPreferences 2>&1'
       #- IPV6_ENABLED=false
     volumes:
       - ${CONFIG_PATH}/gluetun:/gluetun
