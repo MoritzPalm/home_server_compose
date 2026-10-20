@@ -123,7 +123,7 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=external"
       - "traefik.http.routers.paperless.rule=Host(`${HOST_PAPERLESS}`)"
-      - "traefik.http.routers.paperless.entrypoints=tunnel"
+      - "traefik.http.routers.paperless.entrypoints=websecure"
       - "traefik.http.routers.paperless.middlewares=chain-public@file"
       - "traefik.http.services.paperless.loadbalancer.server.port=8000"
     networks:
