@@ -2,12 +2,13 @@
 services:
   plex-server:
     container_name: plex
-    image: 'plexinc/pms-docker:latest@sha256:e0ab27395614a8e1a4fdf84c6bc60ac664915cfdde70c52d030c7728a1c48e14'
+    image: lscr.io/linuxserver/plex:latest@sha256:8f655bad7dcbc5398a78f70a5af12600b4ed3424f901566ed1eaa6710e9e2334
     restart: unless-stopped
     environment:
+      - PUID=1000
+      - PGID=1000
       - TZ=Europe/Berlin
       - VERSION=docker
-      - HOSTNAME=PLEX_SERVER
       - PLEX_CLAIM=${PLEX_CLAIM:-}
     networks:
       - media_network
@@ -38,6 +39,12 @@ services:
       - FOWNER
       - SETGID
       - SETUID
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:32400/identity"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     labels:
       - "homepage.group=Media"
       - "homepage.name=Plex"

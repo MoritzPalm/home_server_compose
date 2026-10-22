@@ -43,14 +43,14 @@
     {
       "description": "Disruptive / config-sensitive: media servers and the VPN download stack get a normal PR but never auto-merge — merge by hand to avoid mid-stream restarts or a broken killswitch.",
       "matchManagers": ["docker-compose"],
-      "matchPackageNames": ["/plexinc/", "/jellyfin/", "/gluetun/", "/qbittorrent/", "/slskd/"],
+      "matchPackageNames": ["/linuxserver/plex/", "/jellyfin/", "/gluetun/", "/qbittorrent/", "/slskd/"],
       "automerge": false,
       "addLabels": ["update/review"]
     },
     {
       "description": "Plex patch releases DO auto-merge, overriding the rule above. Plex is the only internet-facing service with no reverse proxy, WAF or CrowdSec in front of it, so its patch latency is a security property. Minor and major still require a manual merge.",
       "matchManagers": ["docker-compose"],
-      "matchPackageNames": ["/plexinc/"],
+      "matchPackageNames": ["/linuxserver/plex/"],
       "matchUpdateTypes": ["digest", "patch"],
       "automerge": true,
       "addLabels": ["update/security-patch"]
