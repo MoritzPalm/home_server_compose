@@ -7,6 +7,8 @@ services:
       - X_API_KEY=${hevy_X_API_KEY}
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
     hostname: hevy_backend
 
   frontend:
@@ -19,6 +21,8 @@ services:
       - backend
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
     hostname: hevy_frontend
     labels:
       - "homepage.group=Fitness"

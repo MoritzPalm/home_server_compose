@@ -21,13 +21,21 @@ services:
       - dockerproxy
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
     restart: unless-stopped
     ports:
       - ${HOST_IP}:3123:3123
     #command: [sh, -c, "cp -n /app/config/tpl/*.yaml /app/config && node server.js"]
     networks:
-      - internal
       - external
+      - socket
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.homepage.entrypoints=tunnel"
@@ -50,11 +58,11 @@ services:
       - no-new-privileges:true
     restart: unless-stopped
     networks:
-      - internal
+      - socket
 
 
 networks:
   external:
     external: true
-  internal:
-    external: true
+  socket:
+    internal: true

@@ -17,6 +17,8 @@ services:
       - ${CONFIG_PATH}/vikunja/config.yml:/etc/vikunja/config.yml:ro
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
     depends_on:
       db:
         condition: service_healthy

@@ -14,6 +14,8 @@ services:
       - ${MEDIA_PATH}/audiobooks:/audiobooks
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
     restart: unless-stopped
     networks:
       - default
@@ -50,6 +52,8 @@ services:
       - ${MEDIA_PATH}/books:/books
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
     restart: unless-stopped
     networks:
       - default
@@ -101,6 +105,8 @@ services:
     cpus: 4
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
     restart: unless-stopped
     depends_on:
       audiobookshelf:

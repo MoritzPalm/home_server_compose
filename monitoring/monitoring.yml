@@ -228,7 +228,7 @@ services:
       - no-new-privileges:true
     restart: unless-stopped
     networks:
-      - monitoring
+      - socket
 
   whatsupdocker:
     image: getwud/wud:8.4.0@sha256:3765bc5b7303cf6c80d89ecfb41e3a9c2767729826e080be963c48f43b4ee150
@@ -251,6 +251,7 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+      - socket
     labels:
       - "homepage.group=Monitoring"
       - "homepage.name=WUD"
@@ -286,6 +287,7 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+      - socket
 
 
 networks:
@@ -293,4 +295,6 @@ networks:
     driver: bridge
   internal:
     external: true
+  socket:
+    internal: true
 

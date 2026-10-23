@@ -249,6 +249,14 @@ services:
       - immich_internal
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
     labels:
       - "homepage.group=Media"
       - "homepage.name=Immich"
