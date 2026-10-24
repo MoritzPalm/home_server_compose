@@ -23,6 +23,7 @@ services:
     networks:
       - external
       - internal
+      - socket
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -54,7 +55,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-      - internal
+      - socket
     security_opt:
       - no-new-privileges:true
 
@@ -111,3 +112,5 @@ networks:
     external: true
   internal:
     external: true
+  socket:
+    internal: true

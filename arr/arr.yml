@@ -264,6 +264,8 @@ services:
       - PORT=5055 #optional
     security_opt:
      - no-new-privileges:true
+    cap_drop:
+      - ALL
     volumes:
       - ${CONFIG_PATH}/overseerr:/app/config
     healthcheck:
@@ -453,6 +455,14 @@ services:
       - ${STORAGE_PATH}:/data
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
     restart: unless-stopped
     networks:
       - arr

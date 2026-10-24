@@ -109,9 +109,14 @@ services:
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.55.1@sha256:3de2bd5203120b866d74a9b283b2ffb8ec382fbf9dc321814700c6ea6f44ec57
     container_name: cadvisor
+    depends_on:
+      - dockerproxy
     command:
       - '--housekeeping_interval=55s'
       - '--docker_only'
+      # Without a reachable docker API, --docker_only reports only the root
+      # cgroup and every per-container metric and alert goes blank.
+      - '--docker=tcp://dockerproxy:2375'
     ports:
       - ${HOST_IP}:8082:8080
     volumes:
@@ -136,6 +141,7 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+      - socket
     labels:
       - "homepage.group=Monitoring"
       - "homepage.name=cAdvisor"
@@ -211,12 +217,12 @@ services:
   # Read-only, POST-blocking proxy in front of the docker socket. A :ro socket
   # bind does NOT make the docker API read-only (POST still works through it),
   # so wud and promtail previously had near-root API access. This proxy only
-  # exposes the GET endpoints they need and refuses POST/exec/etc.
+  # exposes the GET endpoints they and cadvisor need and refuses POST/exec/etc.
   dockerproxy:
     image: tecnativa/docker-socket-proxy:v0.5.0@sha256:1f5038b54f06c3e18422902cf00ba21803d1c97805aae032e5e6673d532d3459
     container_name: monitoring_dockerproxy
     environment:
-      - CONTAINERS=1   # wud + promtail: list/inspect containers, read logs
+      - CONTAINERS=1   # wud + promtail + cadvisor: list/inspect containers, read logs
       - IMAGES=1       # wud: compare image tags/digests
       - INFO=1
       - VERSION=1
@@ -228,7 +234,7 @@ services:
       - no-new-privileges:true
     restart: unless-stopped
     networks:
-      - monitoring
+      - socket
 
   whatsupdocker:
     image: getwud/wud:8.4.0@sha256:3765bc5b7303cf6c80d89ecfb41e3a9c2767729826e080be963c48f43b4ee150
@@ -251,6 +257,7 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+      - socket
     labels:
       - "homepage.group=Monitoring"
       - "homepage.name=WUD"
@@ -286,6 +293,7 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+      - socket
 
 
 networks:
@@ -293,4 +301,6 @@ networks:
     driver: bridge
   internal:
     external: true
+  socket:
+    internal: true
 
