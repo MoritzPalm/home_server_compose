@@ -73,6 +73,62 @@ services:
       - "traefik.http.routers.kavita.middlewares=chain-public@file"
       - "traefik.http.services.kavita.loadbalancer.server.port=5000"
 
+  # s6-overlay image: it starts as root and drops to PUID/PGID itself, so no
+  # 'user:' here. Settings, OIDC and the admin password live in its SQLite
+  # databases and are written by roles/books/tasks/cwa.yml.
+  calibre-web-automated:
+    image: crocodilestick/calibre-web-automated:v4.0.8@sha256:5e00373854247750cc3e4479b492ae09293ff5e06ed10177f226634d97888679
+    container_name: calibre-web-automated
+    ports:
+      - ${HOST_IP}:8083:8083
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Berlin
+      # Optional. Hardcover is the only enabled metadata source that returns
+      # series; without a token, auto-fetch fills in everything but series.
+      - HARDCOVER_TOKEN=${CWA_HARDCOVER_TOKEN}
+      # Shelfarr hardlinks imports into the ingest folder. link() raises only
+      # IN_CREATE, while the inotify watcher waits for close_write/moved_to, so
+      # hardlinked books would sit there until the next restart.
+      - CWA_WATCH_MODE=poll
+    # All three paths are declared VOLUMEs in the image; any left unmounted
+    # becomes an anonymous volume and its data is orphaned on recreate.
+    volumes:
+      - ${CONFIG_PATH}/calibre-web-automated:/config
+      - ${MEDIA_PATH}/calibre:/calibre-library
+      # Files here are deleted once imported.
+      - ${DOWNLOADS_PATH}/cwa-ingest:/cwa-book-ingest
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    networks:
+      - default
+      - external
+    healthcheck:
+      test: ["CMD", "curl", "-fsL", "--max-time", "5", "http://127.0.0.1:8083/login"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      # First start creates the library and runs calibre setup.
+      start_period: 120s
+    labels:
+      - "homepage.group=Books"
+      - "homepage.name=Calibre-Web"
+      - "homepage.icon=calibre-web"
+      # The public hostname rather than the tailnet port: OIDC redirects back to
+      # the fixed redirect host, so a login started on the IP never completes.
+      - "homepage.href=https://${HOST_CWA}"
+      - "homepage.description=Ebook library"
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.cwa.rule=Host(`${HOST_CWA}`)"
+      - "traefik.http.routers.cwa.entrypoints=tunnel"
+      # No chain-sso: CWA has its own OIDC login, and OPDS readers authenticate
+      # with basic auth, which a forward-auth redirect would break.
+      - "traefik.http.routers.cwa.middlewares=chain-public@file"
+      - "traefik.http.services.cwa.loadbalancer.server.port=8083"
+
   bookbridge:
     image: ghcr.io/cporcellijr/bookbridge:7.4.0@sha256:1ed2497379f639b91b3a4bf2c059e3cfaabed0c7c004a40dcc867df3d38d0d82
     container_name: bookbridge
