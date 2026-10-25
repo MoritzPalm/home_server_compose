@@ -144,7 +144,7 @@ services:
       - no-new-privileges:true
 
   paperless_tika:
-    image: docker.io/apache/tika:3.3.1.0@sha256:90b7fa1dc018434075fce9e1d9b88b1e3d0ea6979d0cf86e116c79a8073ae973
+    image: docker.io/apache/tika:3.3.3.0@sha256:326b238b37904c94ff61fed87afe0af72e6a29fa715933b10af97b7d56f1d4cb
     container_name: paperless_tika
     restart: unless-stopped
     security_opt:
