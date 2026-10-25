@@ -171,6 +171,13 @@ services:
       - ${HOST_IP}:9696:9696 # prowlarr web ui
       - ${HOST_IP}:8191:8191 # flaresolverr web ui
       - ${HOST_IP}:5010:5010 # Mousehole port
+    healthcheck:
+      test: /gluetun-entrypoint healthcheck
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 180s
+      start_interval: 5s
     environment:
       # see https://github.com/qdm12/gluetun-wiki for more details
       # example envs based on https://github.com/qdm12/gluetun-wiki/blob/main/setup/providers/mullvad.md
