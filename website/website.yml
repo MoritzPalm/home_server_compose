@@ -1,0 +1,50 @@
+# Personal landing page at the apex domain. Static files, served by nginx
+# straight out of this clone, so a push plus a playbook run is a deploy.
+services:
+
+  website:
+    image: nginxinc/nginx-unprivileged:1.31.7-alpine@sha256:b5047b9b76845eac124358373c6852377c52e4b05834a47647e955dd91cb8f1e
+    container_name: website
+    volumes:
+      - ./site:/usr/share/nginx/html:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      # The CV stays out of the public repo; the website role creates this dir.
+      - ${CONFIG_PATH}/website/files:/files:ro
+    read_only: true
+    tmpfs:
+      # The unprivileged image keeps its pid file and temp paths under /tmp.
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - external
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.services.website.loadbalancer.server.port=8080"
+
+      - "traefik.http.routers.website.rule=Host(`moritzpalm.com`)"
+      - "traefik.http.routers.website.entrypoints=tunnel"
+      - "traefik.http.routers.website.service=website"
+      - "traefik.http.routers.website.middlewares=chain-public@file"
+
+      # www is accepted at the tunnel and sent to the apex with a 301.
+      - "traefik.http.routers.website-www.rule=Host(`www.moritzpalm.com`)"
+      - "traefik.http.routers.website-www.entrypoints=tunnel"
+      - "traefik.http.routers.website-www.service=website"
+      - "traefik.http.routers.website-www.middlewares=chain-public@file,website-www@docker"
+      - "traefik.http.middlewares.website-www.redirectregex.regex=^https?://www\\.moritzpalm\\.com/(.*)"
+      - "traefik.http.middlewares.website-www.redirectregex.replacement=https://moritzpalm.com/$${1}"
+      - "traefik.http.middlewares.website-www.redirectregex.permanent=true"
+
+networks:
+  external:
+    external: true

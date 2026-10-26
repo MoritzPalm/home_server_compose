@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Moritz Palm</title>
+<meta name="description" content="Moritz Palm is a computer science master's student. He builds segmentation models for medical images and runs the infrastructure underneath them.">
+<meta name="author" content="Moritz Palm">
+<meta name="theme-color" content="#0f0e0c">
+<link rel="canonical" href="https://moritzpalm.com/">
+<meta property="og:type" content="profile">
+<meta property="og:title" content="Moritz Palm">
+<meta property="og:description" content="Computer science master's student. Segmentation models for medical images, and the infrastructure underneath them.">
+<meta property="og:url" content="https://moritzpalm.com/">
+<meta property="og:image" content="https://moritzpalm.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/source-serif-4-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="styles.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Moritz Palm",
+  "url": "https://moritzpalm.com/",
+  "email": "mailto:mail@moritzpalm.com",
+  "jobTitle": "Computer science master's student",
+  "sameAs": [
+    "https://github.com/MoritzPalm",
+    "https://www.linkedin.com/in/moritzpalm/"
+  ],
+  "knowsAbout": [
+    "Medical image segmentation",
+    "Deep learning",
+    "Self-hosted infrastructure",
+    "Ansible",
+    "Docker"
+  ]
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="wrap">
+  <header class="top">
+    <a class="mark" href="#top" aria-label="Moritz Palm, top of page">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 17V3l7 8 7-8v14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/></svg>
+    </a>
+    <nav aria-label="Sections">
+      <a href="#about">About</a>
+      <a href="#work">Work</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <a class="chip chip--down" href="files/cv.pdf">CV <svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1v10M2 7l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <p class="eyebrow">Computer science · M.Sc. student</p>
+      <h1 class="name">
+        <span class="name__line">Moritz</span>
+        <span class="name__line">Palm<span class="name__dot" aria-hidden="true"></span></span>
+      </h1>
+      <p class="lede">I build segmentation models for medical images and run the infrastructure underneath them. The models come from my master's thesis; the infrastructure is a home server I run like production.</p>
+      <ul class="links">
+        <li><a class="chip chip--solid" href="mailto:mail@moritzpalm.com">Email <svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 10 10 2M4 2h6v6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+        <li><a class="chip" href="https://github.com/MoritzPalm" rel="me">GitHub <svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 10 10 2M4 2h6v6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+        <li><a class="chip" href="https://www.linkedin.com/in/moritzpalm/" rel="me">LinkedIn <svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 10 10 2M4 2h6v6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+        <li><a class="chip chip--down" href="files/cv.pdf">CV, PDF <svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1v10M2 7l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+      </ul>
+    </section>
+
+    <section class="sec" id="about">
+      <div class="sec__label"><p class="eyebrow">About</p></div>
+      <div class="sec__body prose">
+        <h2>What I work on</h2>
+        <p>I'm a master's student in computer science. My thesis is about segmenting videofluoroscopic swallowing studies, the X-ray videos clinicians record to see how a person swallows. The models are multimodal: they draw on more than one kind of input to outline the anatomy and the bolus in every frame, so that swallowing disorders can be measured rather than eyeballed.</p>
+        <p>The other half of my time goes into a home server that I treat as a small production system. Ansible provisions the host, every service is a Docker Compose stack in a public repository, traffic enters through a Cloudflare Tunnel and Traefik, and dependency updates arrive as pull requests. Decision records and runbooks live next to the code, because future me is the on-call.</p>
+        <p>Before that: coursework and side projects in machine learning, from LiDAR object detection to generating MNIST digits with kernel density estimation. All of it is on <a href="https://github.com/MoritzPalm">GitHub</a>.</p>
+      </div>
+    </section>
+
+    <section class="sec" id="work">
+      <div class="sec__label"><p class="eyebrow">Work</p></div>
+      <div class="sec__body">
+        <h2>Selected work</h2>
+        <ol class="work">
+          <li class="work__item">
+            <div class="work__text">
+              <div class="work__meta">
+                <p class="eyebrow">Master's thesis</p>
+                <p class="eyebrow">In progress</p>
+              </div>
+              <h3 class="work__title">Multimodal segmentation of swallowing studies</h3>
+              <p>VFSS frames are low-contrast, and the structures that matter move quickly. The thesis builds segmentation models that combine several input modalities and measures what each one contributes.</p>
+              <ul class="tags" aria-label="Topics">
+                <li>Medical imaging</li>
+                <li>Semantic segmentation</li>
+                <li>Multimodal learning</li>
+                <li>Python</li>
+              </ul>
+            </div>
+            <figure class="fig">
+              <svg viewBox="0 0 480 300" role="img" aria-labelledby="fig1-title">
+                <title id="fig1-title">Abstract sketch of one X-ray video frame with the bolus outlined as a segmentation mask</title>
+                <g class="grid">
+                  <path d="M60 0v300M120 0v300M180 0v300M240 0v300M300 0v300M360 0v300M420 0v300M0 60h480M0 120h480M0 180h480M0 240h480"/>
+                </g>
+                <path class="ink-soft" d="M136 18c4 48-12 92 6 134s62 70 92 130M232 18c4 48-14 92 6 134s64 70 94 130"/>
+                <path class="ink" d="M170 18c0 40-18 72-10 110s40 60 66 96 36 44 44 58"/>
+                <path class="mask" d="M184 126c8-20 42-26 60-8 14 14 10 40-4 54-16 16-44 10-54-8-6-12-6-26-2-38z"/>
+                <circle class="dot" cx="216" cy="154" r="3"/>
+                <path class="ink-soft" d="M240 150h78"/>
+                <text x="326" y="154" class="t-accent">bolus</text>
+                <text x="16" y="30">VFSS · frame 132</text>
+                <text x="16" y="286">lateral view</text>
+                <text x="384" y="286" class="t-accent">mask</text>
+              </svg>
+              <figcaption>One frame, one mask: the shape the model has to find</figcaption>
+            </figure>
+          </li>
+
+          <li class="work__item">
+            <div class="work__text">
+              <div class="work__meta">
+                <p class="eyebrow">Home server</p>
+                <p class="eyebrow">Since 2025</p>
+              </div>
+              <h3 class="work__title">A home server, run like production</h3>
+              <p>Twenty-odd self-hosted services on one machine: photos, documents, books, media, recipes and a few tools of my own. Traefik routes everything behind a Cloudflare Tunnel, CrowdSec screens requests, Authentik handles sign-in, and a Raspberry Pi watches from outside the network.</p>
+              <p>Renovate opens the update pull requests, tiered by how much damage a bad release could do. Postgres never auto-merges; a stateless patch does.</p>
+              <ul class="tags" aria-label="Stack">
+                <li>Ansible</li>
+                <li>Docker Compose</li>
+                <li>Traefik</li>
+                <li>Cloudflare Tunnel</li>
+                <li>Authentik</li>
+                <li>CrowdSec</li>
+                <li>Prometheus</li>
+                <li>Renovate</li>
+              </ul>
+              <div class="work__links">
+                <a class="alink" href="https://github.com/MoritzPalm/home_server_compose">Compose stacks <svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 10 10 2M4 2h6v6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+                <a class="alink" href="https://github.com/MoritzPalm/home_server_ansible">Ansible <svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 10 10 2M4 2h6v6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+              </div>
+            </div>
+            <figure class="fig">
+              <svg viewBox="0 0 480 300" role="img" aria-labelledby="fig2-title">
+                <title id="fig2-title">Request path: internet to Cloudflare Tunnel to Traefik to the services, with a Raspberry Pi checking from outside</title>
+                <defs>
+                  <marker id="head" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                    <path class="head" d="M0 0l8 4-8 4z"/>
+                  </marker>
+                </defs>
+                <text x="16" y="30">Request path</text>
+                <circle class="node" cx="60" cy="120" r="26"/>
+                <text x="60" y="124" text-anchor="middle">web</text>
+                <path class="flow" d="M90 120h44"/>
+                <rect class="node" x="140" y="96" width="118" height="48" rx="2"/>
+                <text x="199" y="124" text-anchor="middle">CF tunnel</text>
+                <path class="flow" d="M262 120h44"/>
+                <rect class="node node--hot" x="312" y="96" width="118" height="48" rx="2"/>
+                <text x="371" y="124" text-anchor="middle" class="t-accent">Traefik</text>
+                <text x="371" y="86" text-anchor="middle">crowdsec · sso</text>
+                <path class="flow" d="M371 148v30"/>
+                <g class="svc">
+                  <rect x="300" y="186" width="30" height="30"/>
+                  <rect x="338" y="186" width="30" height="30"/>
+                  <rect x="376" y="186" width="30" height="30"/>
+                  <rect x="414" y="186" width="30" height="30"/>
+                  <rect x="300" y="224" width="30" height="30"/>
+                  <rect x="338" y="224" width="30" height="30"/>
+                  <rect x="376" y="224" width="30" height="30"/>
+                  <rect x="414" y="224" width="30" height="30"/>
+                </g>
+                <text x="372" y="286" text-anchor="middle">services</text>
+                <rect class="node" x="36" y="212" width="48" height="36" rx="2"/>
+                <circle class="dot" cx="60" cy="230" r="3"/>
+                <text x="60" y="270" text-anchor="middle">pi</text>
+                <path class="flow flow--dash" d="M90 226c60 0 120-30 170-60"/>
+                <text x="130" y="200">checks from outside</text>
+              </svg>
+              <figcaption>Every public hostname enters through the tunnel; nothing is port-forwarded</figcaption>
+            </figure>
+          </li>
+        </ol>
+
+        <h3 class="earlier-title">Earlier</h3>
+        <ul class="earlier">
+          <li><time datetime="2024">2024</time><a href="https://github.com/MoritzPalm/LiDAR_Detection">LiDAR object detection <svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 10 10 2M4 2h6v6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+          <li><time datetime="2023">2023</time><a href="https://github.com/MoritzPalm/LeagueOfLegendsWinPrediction">Predicting League of Legends match outcomes <svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 10 10 2M4 2h6v6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+          <li><time datetime="2022">2022</time><a href="https://github.com/MoritzPalm/KernelDensityEstimation">Generating MNIST digits with kernel density estimation <svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 10 10 2M4 2h6v6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+          <li><time datetime="2022">2022</time><a href="https://github.com/MoritzPalm/naivebayes">Naive Bayes against k-nearest neighbours <svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 10 10 2M4 2h6v6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="sec contact" id="contact">
+      <div class="sec__label"><p class="eyebrow">Contact</p></div>
+      <div class="sec__body">
+        <h2>Say hello.</h2>
+        <p>Email is the best way to reach me. For anything professional, LinkedIn works too.</p>
+        <div class="contact__row">
+          <a class="contact__mail" id="mail" href="mailto:mail@moritzpalm.com">mail@moritzpalm.com</a>
+          <button class="copy" type="button" id="copy-mail" data-copy="mail@moritzpalm.com">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M11 5V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+            <span>Copy</span>
+          </button>
+        </div>
+        <ul class="links">
+          <li><a class="chip" href="https://github.com/MoritzPalm">GitHub <svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 10 10 2M4 2h6v6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+          <li><a class="chip" href="https://www.linkedin.com/in/moritzpalm/">LinkedIn <svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 10 10 2M4 2h6v6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>© 2026 Moritz Palm</span>
+    <span>No cookies, no analytics.</span>
+    <span>Served from my own home server.</span>
+    <a href="https://github.com/MoritzPalm/home_server_compose/tree/main/website">Source <svg class="arrow" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 10 10 2M4 2h6v6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+  </footer>
+</div>
+
+<script src="main.js" defer></script>
+</body>
+</html>
