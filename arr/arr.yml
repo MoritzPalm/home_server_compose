@@ -379,9 +379,11 @@ services:
       TZ: Europe/Berlin
       MOUSEHOLE_AUTH_PASSWORD: ${MOUSEHOLE_AUTH_PASSWORD}
       MOUSEHOLE_ALLOWED_HOSTS: ${MOUSEHOLE_ALLOWED_HOSTS}
+      # pinned so a changed upstream default can't move state off the mount again
+      MOUSEHOLE_STATE_DIR_PATH: /var/lib/mousehole
     volumes:
-      # persist cookie data across container restarts
-      - "${CONFIG_PATH}/mousehole:/srv/mousehole"
+      # holds the MAM cookie (state.json); without it the cookie is lost on every recreate
+      - "${CONFIG_PATH}/mousehole:/var/lib/mousehole"
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
