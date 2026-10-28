@@ -117,12 +117,11 @@ services:
       # Without a reachable docker API, --docker_only reports only the root
       # cgroup and every per-container metric and alert goes blank.
       - '--docker=tcp://dockerproxy:2375'
-    ports:
-      - ${HOST_IP}:8082:8080
     volumes:
       - /:/rootfs:ro
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
+      - /run/containerd/containerd.sock:/run/containerd/containerd.sock:ro
     devices:
       - /dev/kmsg
     security_opt:
@@ -146,7 +145,6 @@ services:
       - "homepage.group=Monitoring"
       - "homepage.name=cAdvisor"
       - "homepage.icon=cadvisor"
-      - "homepage.href=http://${HOST_IP}:8082"
       - "homepage.description=Container metrics"
 
   grafana:
