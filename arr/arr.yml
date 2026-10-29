@@ -28,8 +28,15 @@ services:
       - "homepage.group=Downloads"
       - "homepage.name=Prowlarr"
       - "homepage.icon=prowlarr"
-      - "homepage.href=http://${HOST_IP}:9696"
+      - "homepage.href=https://prowlarr.${INTERNAL_DOMAIN}"
       - "homepage.description=Indexer manager"
+      # Shares gluetun's network namespace; see the labels on gluetun.
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.prowlarr.rule=Host(`prowlarr.${INTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.prowlarr.entrypoints=websecure"
+      - "traefik.http.routers.prowlarr.middlewares=chain-public@file"
+      - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
 
   sonarr:
     image: linuxserver/sonarr:latest@sha256:f247545d23ba8b233d6604575347e48a623fe6ad75dda02348bf81917f3b5c06
@@ -58,12 +65,19 @@ services:
     restart: unless-stopped
     networks:
       - arr
+      - external
     labels:
       - "homepage.group=Arr"
       - "homepage.name=Sonarr"
       - "homepage.icon=sonarr"
-      - "homepage.href=http://${HOST_IP}:8989"
+      - "homepage.href=https://sonarr.${INTERNAL_DOMAIN}"
       - "homepage.description=TV series"
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.sonarr.rule=Host(`sonarr.${INTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.sonarr.entrypoints=websecure"
+      - "traefik.http.routers.sonarr.middlewares=chain-public@file"
+      - "traefik.http.services.sonarr.loadbalancer.server.port=8989"
 
   radarr:
     image: linuxserver/radarr:latest@sha256:adb6c09d6b729ea5e642c99cea35af72702ef476bf4763f153299ac5db9f0b4f
@@ -92,12 +106,19 @@ services:
     restart: unless-stopped
     networks:
       - arr
+      - external
     labels:
       - "homepage.group=Arr"
       - "homepage.name=Radarr"
       - "homepage.icon=radarr"
-      - "homepage.href=http://${HOST_IP}:7878"
+      - "homepage.href=https://radarr.${INTERNAL_DOMAIN}"
       - "homepage.description=Movies"
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.radarr.rule=Host(`radarr.${INTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.radarr.entrypoints=websecure"
+      - "traefik.http.routers.radarr.middlewares=chain-public@file"
+      - "traefik.http.services.radarr.loadbalancer.server.port=7878"
 
   lidarr:
     image: linuxserver/lidarr:latest@sha256:60be9a1faad3dfba5a711163fc18526845e2ce7b50b463dd9effae7f766c9beb
@@ -126,12 +147,19 @@ services:
     restart: unless-stopped
     networks:
       - arr
+      - external
     labels:
       - "homepage.group=Arr"
       - "homepage.name=Lidarr"
       - "homepage.icon=lidarr"
-      - "homepage.href=http://${HOST_IP}:8686"
+      - "homepage.href=https://lidarr.${INTERNAL_DOMAIN}"
       - "homepage.description=Music"
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.lidarr.rule=Host(`lidarr.${INTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.lidarr.entrypoints=websecure"
+      - "traefik.http.routers.lidarr.middlewares=chain-public@file"
+      - "traefik.http.services.lidarr.loadbalancer.server.port=8686"
 
 
   flaresolverr:
@@ -202,6 +230,13 @@ services:
       - arr
       - default
       - media_network
+      # traefik reaches the web UIs of the containers sharing this network
+      # namespace (prowlarr, qbittorrent, slskd, mousehole) over this network.
+      - external
+    labels:
+      # traefik resolves a container in network_mode service:gluetun by
+      # inspecting gluetun and reading the network from this label.
+      - "traefik.docker.network=external"
 
 
   # image used to download stuff; run over gluetun network (vpn killswitch)
@@ -236,8 +271,15 @@ services:
       - "homepage.group=Downloads"
       - "homepage.name=qBittorrent"
       - "homepage.icon=qbittorrent"
-      - "homepage.href=http://${HOST_IP}:8088"
+      - "homepage.href=https://qbittorrent.${INTERNAL_DOMAIN}"
       - "homepage.description=Torrent client"
+      # Shares gluetun's network namespace; see the labels on gluetun.
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.${INTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.qbittorrent.entrypoints=websecure"
+      - "traefik.http.routers.qbittorrent.middlewares=chain-public@file"
+      - "traefik.http.services.qbittorrent.loadbalancer.server.port=8088"
 
   # keeps myanonamouse/torrentleech torrents force-resumed (bypassing queueing limits)
   # so seeding points/ratio keep accruing even once qbittorrent's queueing is enabled
@@ -321,6 +363,7 @@ services:
     restart: unless-stopped
     networks:
       - arr
+      - external
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://127.0.0.1:6767/api"]
       interval: 30s
@@ -333,8 +376,14 @@ services:
       - "homepage.group=Arr"
       - "homepage.name=Bazarr"
       - "homepage.icon=bazarr"
-      - "homepage.href=http://${HOST_IP}:6767"
+      - "homepage.href=https://bazarr.${INTERNAL_DOMAIN}"
       - "homepage.description=Subtitles"
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.bazarr.rule=Host(`bazarr.${INTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.bazarr.entrypoints=websecure"
+      - "traefik.http.routers.bazarr.middlewares=chain-public@file"
+      - "traefik.http.services.bazarr.loadbalancer.server.port=6767"
 
 
   whisparr:
@@ -357,10 +406,17 @@ services:
       - "homepage.group=Arr"
       - "homepage.name=Whisparr"
       - "homepage.icon=whisparr"
-      - "homepage.href=http://${HOST_IP}:6969"
+      - "homepage.href=https://whisparr.${INTERNAL_DOMAIN}"
       - "homepage.description=Adult content"
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.whisparr.rule=Host(`whisparr.${INTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.whisparr.entrypoints=websecure"
+      - "traefik.http.routers.whisparr.middlewares=chain-public@file"
+      - "traefik.http.services.whisparr.loadbalancer.server.port=6969"
     networks:
       - arr
+      - external
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://127.0.0.1:6969/ping"]
       interval: 30s
@@ -387,6 +443,15 @@ services:
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
+    labels:
+      # Shares gluetun's network namespace; see the labels on gluetun.
+      # The hostname must also be in MOUSEHOLE_ALLOWED_HOSTS, which ansible sets.
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.mousehole.rule=Host(`mousehole.${INTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.mousehole.entrypoints=websecure"
+      - "traefik.http.routers.mousehole.middlewares=chain-public@file"
+      - "traefik.http.services.mousehole.loadbalancer.server.port=5010"
 
 
   slskd:
@@ -414,8 +479,15 @@ services:
       - "homepage.group=Music"
       - "homepage.name=slskd"
       - "homepage.icon=slskd"
-      - "homepage.href=http://${HOST_IP}:5030"
+      - "homepage.href=https://slskd.${INTERNAL_DOMAIN}"
       - "homepage.description=Soulseek client"
+      # Shares gluetun's network namespace; see the labels on gluetun.
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.slskd.rule=Host(`slskd.${INTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.slskd.entrypoints=websecure"
+      - "traefik.http.routers.slskd.middlewares=chain-public@file"
+      - "traefik.http.services.slskd.loadbalancer.server.port=5030"
 
 
   profilarr:
@@ -433,6 +505,7 @@ services:
     restart: unless-stopped
     networks:
       - arr
+      - external
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:6868/health"]
       interval: 30s
@@ -445,8 +518,14 @@ services:
       - "homepage.group=Arr"
       - "homepage.name=Profilarr"
       - "homepage.icon=profilarr"
-      - "homepage.href=http://${HOST_IP}:6868"
+      - "homepage.href=https://profilarr.${INTERNAL_DOMAIN}"
       - "homepage.description=Quality profiles"
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.profilarr.rule=Host(`profilarr.${INTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.profilarr.entrypoints=websecure"
+      - "traefik.http.routers.profilarr.middlewares=chain-public@file"
+      - "traefik.http.services.profilarr.loadbalancer.server.port=6868"
 
 
   shelfarr:

@@ -65,6 +65,7 @@ services:
       - TZ=Europe/Berlin
     networks:
       - media_network
+      - external
     ports:
       - ${HOST_IP}:8008:8008      # Main web app
       - ${HOST_IP}:8888:8888      # Spotify OAuth callback
@@ -90,8 +91,15 @@ services:
       - "homepage.group=Music"
       - "homepage.name=SoulSync"
       - "homepage.icon=soulsync"
-      - "homepage.href=http://${HOST_IP}:8008"
+      - "homepage.href=https://soulsync.${INTERNAL_DOMAIN}"
       - "homepage.description=Music sync"
+      # The OAuth callbacks on 8888/8889 stay on the published ports.
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.soulsync.rule=Host(`soulsync.${INTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.soulsync.entrypoints=websecure"
+      - "traefik.http.routers.soulsync.middlewares=chain-public@file"
+      - "traefik.http.services.soulsync.loadbalancer.server.port=8008"
 
   multi-scrobbler:
     image: foxxmd/multi-scrobbler:0.18.1@sha256:f5c90df5c84839a443fd8ea36553706690b8a865a6cf6b4c74eb7d9ca47b820d
@@ -102,7 +110,7 @@ services:
       - PGID=1000
       # external base URL — used to build UI links and the default OAuth
       # redirect. Overridden for Spotify below.
-      - BASE_URL=http://${HOST_IP}:9078
+      - BASE_URL=https://multi-scrobbler.${INTERNAL_DOMAIN}
       # --- Spotify source. SPOTIFY_ID activates the source via ENV config. ---
       - SPOTIFY_ID=spotify
       - SPOTIFY_CLIENT_ID=${MS_SPOTIFY_CLIENT_ID}
@@ -122,6 +130,7 @@ services:
       - LZ_USER=${MS_LISTENBRAINZ_USER}
     networks:
       - media_network
+      - external
     ports:
       - ${HOST_IP}:9078:9078      # Web UI + Spotify OAuth callback
     volumes:
@@ -139,8 +148,14 @@ services:
       - "homepage.group=Music"
       - "homepage.name=Multi-Scrobbler"
       - "homepage.icon=listenbrainz"
-      - "homepage.href=http://${HOST_IP}:9078"
+      - "homepage.href=https://multi-scrobbler.${INTERNAL_DOMAIN}"
       - "homepage.description=Plex + Spotify → ListenBrainz scrobbling"
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.multi-scrobbler.rule=Host(`multi-scrobbler.${INTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.multi-scrobbler.entrypoints=websecure"
+      - "traefik.http.routers.multi-scrobbler.middlewares=chain-public@file"
+      - "traefik.http.services.multi-scrobbler.loadbalancer.server.port=9078"
 
   jellyfin:
     image: jellyfin/jellyfin:10.11.11@sha256:aefb67e6a7ff1debdd154a78a7bbb780fd0c873d8639210a7f6a2016ad2b35db
@@ -148,6 +163,7 @@ services:
     user: "1000:1000"
     networks:
       - media_network
+      - external
     ports:
       - ${LAN_IP}:8096:8096
       - ${HOST_IP}:8096:8096   # HTTP web UI (LAN + tailnet)
@@ -176,8 +192,14 @@ services:
       - "homepage.group=Media"
       - "homepage.name=Jellyfin"
       - "homepage.icon=jellyfin"
-      - "homepage.href=http://${HOST_IP}:8096"
+      - "homepage.href=https://jellyfin.${INTERNAL_DOMAIN}"
       - "homepage.description=Media server"
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.${INTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.jellyfin.entrypoints=websecure"
+      - "traefik.http.routers.jellyfin.middlewares=chain-public@file"
+      - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
 
 
   stash:
@@ -186,6 +208,7 @@ services:
     networks:
       - media_network
       - arr
+      - external
     ports:
       - ${HOST_IP}:9999:9999
     environment:
@@ -212,8 +235,14 @@ services:
       - "homepage.group=Media"
       - "homepage.name=Stash"
       - "homepage.icon=stash"
-      - "homepage.href=http://${HOST_IP}:9999"
+      - "homepage.href=https://stash.${INTERNAL_DOMAIN}"
       - "homepage.description=Adult content library"
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.stash.rule=Host(`stash.${INTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.stash.entrypoints=websecure"
+      - "traefik.http.routers.stash.middlewares=chain-public@file"
+      - "traefik.http.services.stash.loadbalancer.server.port=9999"
 
   immich-server:
     container_name: immich_server

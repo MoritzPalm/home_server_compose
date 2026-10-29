@@ -12,6 +12,8 @@ services:
       - '--storage.tsdb.path=/prometheus'
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
+      # Alerts link back to this hostname.
+      - '--web.external-url=https://prometheus.${INTERNAL_DOMAIN}'
     ports:
       - ${HOST_IP}:9090:9090
     # ordering only — prometheus handles down targets fine, so don't refuse
@@ -41,12 +43,19 @@ services:
     networks:
       - monitoring
       - internal
+      - external
     labels:
       - "homepage.group=Monitoring"
       - "homepage.name=Prometheus"
       - "homepage.icon=prometheus"
-      - "homepage.href=http://${HOST_IP}:9090"
+      - "homepage.href=https://prometheus.${INTERNAL_DOMAIN}"
       - "homepage.description=Metrics"
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.prometheus.rule=Host(`prometheus.${INTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.prometheus.entrypoints=websecure"
+      - "traefik.http.routers.prometheus.middlewares=chain-public@file"
+      - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
 
 
   node-exporter:
@@ -81,6 +90,8 @@ services:
     command:
       - '--config.file=/etc/alertmanager/config.yml'
       - '--storage.path=/alertmanager'
+      # Notifications link back to this hostname.
+      - '--web.external-url=https://alertmanager.${INTERNAL_DOMAIN}'
     ports:
       - ${HOST_IP}:9093:9093
     volumes:
@@ -88,6 +99,7 @@ services:
       - ${DATABASE_DIR}/alertmanager:/alertmanager
     networks:
       - monitoring
+      - external
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -103,8 +115,14 @@ services:
       - "homepage.group=Monitoring"
       - "homepage.name=Alertmanager"
       - "homepage.icon=alertmanager"
-      - "homepage.href=http://${HOST_IP}:9093"
+      - "homepage.href=https://alertmanager.${INTERNAL_DOMAIN}"
       - "homepage.description=Alerts"
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.alertmanager.rule=Host(`alertmanager.${INTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.alertmanager.entrypoints=websecure"
+      - "traefik.http.routers.alertmanager.middlewares=chain-public@file"
+      - "traefik.http.services.alertmanager.loadbalancer.server.port=9093"
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.55.1@sha256:3de2bd5203120b866d74a9b283b2ffb8ec382fbf9dc321814700c6ea6f44ec57
@@ -163,6 +181,8 @@ services:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
       - GF_INSTALL_PLUGINS=
+      # Links in notifications and the origin Grafana Live accepts.
+      - GF_SERVER_ROOT_URL=https://grafana.${INTERNAL_DOMAIN}
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -182,12 +202,19 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
+      - external
     labels:
       - "homepage.group=Monitoring"
       - "homepage.name=Grafana"
       - "homepage.icon=grafana"
-      - "homepage.href=http://${HOST_IP}:3000"
+      - "homepage.href=https://grafana.${INTERNAL_DOMAIN}"
       - "homepage.description=Dashboards"
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.${INTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.grafana.entrypoints=websecure"
+      - "traefik.http.routers.grafana.middlewares=chain-public@file"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
 
   smartctl-exporter:
     image: prometheuscommunity/smartctl-exporter:v0.15.0@sha256:a76e08dbf5db4781fefd1ed81c65ad46ae8d2849dae6b6d3acebcde2fc4e59d6
@@ -256,12 +283,19 @@ services:
     networks:
       - monitoring
       - socket
+      - external
     labels:
       - "homepage.group=Monitoring"
       - "homepage.name=WUD"
       - "homepage.icon=wud"
-      - "homepage.href=http://${HOST_IP}:3001"
+      - "homepage.href=https://wud.${INTERNAL_DOMAIN}"
       - "homepage.description=Image update notifications"
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.wud.rule=Host(`wud.${INTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.wud.entrypoints=websecure"
+      - "traefik.http.routers.wud.middlewares=chain-public@file"
+      - "traefik.http.services.wud.loadbalancer.server.port=3000"
 
   loki:
     image: grafana/loki:3.7.9@sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28
@@ -298,6 +332,8 @@ networks:
   monitoring:
     driver: bridge
   internal:
+    external: true
+  external:
     external: true
   socket:
     internal: true

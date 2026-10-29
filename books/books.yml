@@ -39,43 +39,6 @@ services:
       - "traefik.http.routers.audiobookshelf.middlewares=chain-public@file"
       - "traefik.http.services.audiobookshelf.loadbalancer.server.port=80"
 
-  kavita:
-    image: jvmilazz0/kavita:0.9.0.2@sha256:ca6af7a18d7124d014702983c2364e485294f808c1552e9555f2595b7cda7982
-    container_name: kavita
-    user: "1000:1000"
-    ports:
-      - ${HOST_IP}:5000:5000
-    environment:
-      - TZ=Europe/Berlin
-    volumes:
-      - ${CONFIG_PATH}/kavita:/kavita/config
-      - ${MEDIA_PATH}/books:/books
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    restart: unless-stopped
-    networks:
-      - default
-      - external
-    healthcheck:
-      test: ["CMD", "curl", "--fail", "http://127.0.0.1:5000/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    labels:
-      - "homepage.group=Books"
-      - "homepage.name=Kavita"
-      - "homepage.icon=kavita"
-      - "homepage.href=http://${HOST_IP}:5000"
-      - "homepage.description=Ebooks"
-      - "traefik.enable=true"
-      - "traefik.docker.network=external"
-      - "traefik.http.routers.kavita.rule=Host(`${HOST_KAVITA}`)"
-      - "traefik.http.routers.kavita.entrypoints=tunnel"
-      - "traefik.http.routers.kavita.middlewares=chain-public@file"
-      - "traefik.http.services.kavita.loadbalancer.server.port=5000"
 
   # s6-overlay image: it starts as root and drops to PUID/PGID itself, so no
   # 'user:' here. Settings, OIDC and the admin password live in its SQLite
@@ -180,17 +143,26 @@ services:
       - "homepage.group=Books"
       - "homepage.name=BookBridge"
       - "homepage.icon=audiobookshelf"
-      - "homepage.href=http://${HOST_IP}:5757"
+      - "homepage.href=https://bookbridge.${INTERNAL_DOMAIN}"
       - "homepage.description=Ebook/audiobook sync"
       - "traefik.enable=true"
       - "traefik.docker.network=external"
+      # Two services on one container, so each router names its service.
       - "traefik.http.routers.bookbridge.rule=Host(`${HOST_BOOKBRIDGE}`)"
       - "traefik.http.routers.bookbridge.entrypoints=tunnel"
+      - "traefik.http.routers.bookbridge.service=bookbridge"
       # chain-public, not chain-sso: KOReader cannot complete an authentik redirect.
       # The kosync protocol authenticates with its own per-reader credentials, which
       # is why only the split kosync port is routed here.
       - "traefik.http.routers.bookbridge.middlewares=chain-public@file"
       - "traefik.http.services.bookbridge.loadbalancer.server.port=5758"
+      # The dashboard is reachable on the internal hostname only. websecure never
+      # faces the internet, so the split-port protection above still holds.
+      - "traefik.http.routers.bookbridge-admin.rule=Host(`bookbridge.${INTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.bookbridge-admin.entrypoints=websecure"
+      - "traefik.http.routers.bookbridge-admin.service=bookbridge-admin"
+      - "traefik.http.routers.bookbridge-admin.middlewares=chain-public@file"
+      - "traefik.http.services.bookbridge-admin.loadbalancer.server.port=5757"
 
 networks:
   external:
