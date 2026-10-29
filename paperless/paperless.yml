@@ -87,6 +87,9 @@ services:
       PAPERLESS_OCR_LANGUAGES: deu eng
       PAPERLESS_OCR_USER_ARGS: '{"invalidate_digital_signatures": true, "continue_on_soft_render_error": true}'
 
+      PAPERLESS_FILENAME_FORMAT: "{{ correspondent }}/{{ created_year }}/{{ created }} {{ title }}"
+      PAPERLESS_FILENAME_FORMAT_REMOVE_NONE: "true"
+
       PAPERLESS_TIKA_ENABLED: 1
       PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://paperless_gotenberg:3000
       PAPERLESS_TIKA_ENDPOINT: http://paperless_tika:9998
