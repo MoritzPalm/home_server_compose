@@ -132,6 +132,10 @@ services:
     command:
       - '--housekeeping_interval=55s'
       - '--docker_only'
+      # Copying every docker label onto every series adds 20-40 labels each;
+      # the compose project and service are all the dashboards group by.
+      - '--store_container_labels=false'
+      - '--whitelisted_container_labels=com.docker.compose.project,com.docker.compose.service'
       # Without a reachable docker API, --docker_only reports only the root
       # cgroup and every per-container metric and alert goes blank.
       - '--docker=tcp://dockerproxy:2375'
@@ -253,6 +257,7 @@ services:
       - INFO=1
       - VERSION=1
       - EVENTS=1       # promtail service discovery watches the event stream
+      - NETWORKS=1     # promtail discovery lists networks; a 403 here drops every target
       - POST=0         # deny all writes (create/start/kill/exec)
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
