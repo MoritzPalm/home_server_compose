@@ -30,7 +30,7 @@ services:
       - "homepage.group=Books"
       - "homepage.name=Audiobookshelf"
       - "homepage.icon=audiobookshelf"
-      - "homepage.href=http://${HOST_IP}:13378"
+      - "homepage.href=https://${HOST_AUDIOBOOKSHELF}"
       - "homepage.description=Audiobooks"
       - "traefik.enable=true"
       - "traefik.docker.network=external"

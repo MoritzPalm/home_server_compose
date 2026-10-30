@@ -27,7 +27,7 @@ services:
       - "homepage.group=Productivity"
       - "homepage.name=Vikunja"
       - "homepage.icon=vikunja"
-      - "homepage.href=http://${HOST_IP}:3456"
+      - "homepage.href=https://${HOST_VIKUNJA}"
       - "homepage.description=Task manager"
       - "traefik.enable=true"
       - "traefik.docker.network=external"

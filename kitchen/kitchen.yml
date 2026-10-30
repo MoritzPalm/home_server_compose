@@ -87,7 +87,7 @@ services:
       - "homepage.group=Kitchen"
       - "homepage.name=Tandoor"
       - "homepage.icon=tandoor"
-      - "homepage.href=http://${HOST_IP}:9815"
+      - "homepage.href=https://${HOST_TANDOOR}"
       - "homepage.description=Recipe manager"
       - "traefik.enable=true"
       - "traefik.docker.network=external"
