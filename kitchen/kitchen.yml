@@ -42,7 +42,8 @@ services:
       - POSTGRES_PASSWORD=${RECIPES_DB_PASSWORD}
       
       - SECRET_KEY=${RECIPES_SECRET_KEY}
-      - ALLOWED_HOSTS=${HOST_TANDOOR},${HOST_IP},localhost
+      # 'tandoor' is the stack-internal name recipe-bridge calls the API by.
+      - ALLOWED_HOSTS=${HOST_TANDOOR},${HOST_IP},localhost,tandoor
       - CSRF_TRUSTED_ORIGINS=https://${HOST_TANDOOR}
       - SOCIAL_PROVIDERS=allauth.socialaccount.providers.openid_connect
       - SOCIALACCOUNT_PROVIDERS={"openid_connect":{"APPS":[{"provider_id":"authentik","name":"Authentik","client_id":"tandoor","secret":"${OIDC_TANDOOR_SECRET}","settings":{"server_url":"https://${HOST_AUTHENTIK}/application/o/tandoor-oidc/.well-known/openid-configuration"}}]}}
@@ -95,13 +96,69 @@ services:
       - "traefik.http.routers.tandoor.entrypoints=tunnel"
       - "traefik.http.routers.tandoor.middlewares=chain-public@file"
       - "traefik.http.services.tandoor.loadbalancer.server.port=80"
-
-  
     networks:
       # 'default' keeps the link to the db/backend in this stack;
       # 'external' is only for Traefik to reach this container.
       - default
       - external
+
+  # Import front-end for Tandoor. Reads a recipe page, book scan or video with
+  # an LLM, converts US units to metric and writes the result into Tandoor over
+  # its API. Tandoor's own importer keeps the source units, and its recipe view
+  # never displays converted amounts, so this is the only path to metric
+  # recipes. Beta software from a single maintainer; every change it makes is
+  # a reviewed suggestion and can be undone from its UI.
+  recipe-bridge:
+    image: ghcr.io/carllvin/recipe-bridge:1.4.0@sha256:56a65a8f51640d565f6e1ffe2d2fabc414d458e1e13a95bd3008918aa68a7a20
+    container_name: recipe-bridge
+    hostname: recipe-bridge
+    # No published port: the app has no login of its own, so it is reachable
+    # only through Traefik with authentik in front.
+    environment:
+      - RECIPE_MANAGER=tandoor
+      - TANDOOR_URL=http://tandoor
+      - TANDOOR_TOKEN=${RECIPE_BRIDGE_TANDOOR_TOKEN}
+      - AI_PROVIDER=anthropic
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      # The image defaults to last-generation models. Opus for reading recipes,
+      # Haiku for the batch maintenance tools and the weekly plan.
+      - CLAUDE_MODEL=claude-opus-5-5
+      - CLAUDE_TOOLS_MODEL=claude-haiku-5-5
+      # Interface language only, since recipes keep their original language.
+      - OUTPUT_LANGUAGE=English
+      - TRANSLATE_RECIPES=false
+      - CONVERT_TO_METRIC=true
+      - OCR_LANGUAGES=eng+deu
+      - APP_URL=https://recipe-bridge.${INTERNAL_DOMAIN}
+      - TZ=${TZ:-Europe/Berlin}
+    volumes:
+      # Settings, undo log, import jobs. Under CONFIG_PATH so restic backs it up.
+      - ${CONFIG_PATH}/recipe-bridge:/app/data
+    depends_on:
+      tandoor:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    # Health check comes from the image (GET /api/ping).
+    restart: unless-stopped
+    labels:
+      - "homepage.group=Kitchen"
+      - "homepage.name=Recipe Bridge"
+      - "homepage.icon=mdi-import"
+      - "homepage.href=https://recipe-bridge.${INTERNAL_DOMAIN}"
+      - "homepage.description=Recipe import with metric conversion"
+      - "traefik.enable=true"
+      - "traefik.docker.network=external"
+      - "traefik.http.routers.recipe-bridge.rule=Host(`recipe-bridge.${INTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.recipe-bridge.entrypoints=websecure"
+      - "traefik.http.routers.recipe-bridge.middlewares=chain-sso@file"
+      - "traefik.http.services.recipe-bridge.loadbalancer.server.port=8000"
+    networks:
+      - default
+      - external
+
 volumes:
   recipes_staticfiles:
     driver: local

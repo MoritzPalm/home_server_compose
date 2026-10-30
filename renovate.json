@@ -68,6 +68,13 @@
       "addLabels": ["update/review"]
     },
     {
+      "description": "Recipe Bridge is beta software from a single maintainer that rewrites data in Tandoor through its API, and every release so far has changed what it writes (unit merges, conversions, tags). A patch that auto-merges here changes production recipe data unreviewed, so every update gets a PR.",
+      "matchManagers": ["docker-compose"],
+      "matchPackageNames": ["/recipe-bridge/"],
+      "automerge": false,
+      "addLabels": ["update/review"]
+    },
+    {
       "description": "Public ingress edge. A bad update to any of these takes every public hostname offline at once and is awkward to diagnose from outside the network, so they get a normal PR and never auto-merge. Paperless is included because it runs database migrations on start.",
       "matchManagers": ["docker-compose"],
       "matchPackageNames": [
