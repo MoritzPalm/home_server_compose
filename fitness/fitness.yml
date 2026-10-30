@@ -5,6 +5,7 @@ services:
     restart: unless-stopped
     environment:
       - X_API_KEY=${hevy_X_API_KEY}
+      - RECAPTCHA_SITE_KEY=6LfkQG0jAAAAANTrIkVXKPfSPHyJnt4hYPWqxh0R
     security_opt:
       - no-new-privileges:true
     cap_drop:
