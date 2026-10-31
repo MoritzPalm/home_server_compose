@@ -94,6 +94,11 @@ services:
       # No chain-sso: CWA has its own OIDC login, and OPDS readers authenticate
       # with basic auth, which a forward-auth redirect would break.
       - "traefik.http.routers.cwa.middlewares=chain-public@file"
+      # Tailnet route for uploads over Cloudflare's 100 MB request body cap.
+      # OIDC redirects to HOST_CWA, so log in here with a local password.
+      - "traefik.http.routers.cwa-int.rule=Host(`cwa.${INTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.cwa-int.entrypoints=websecure"
+      - "traefik.http.routers.cwa-int.middlewares=chain-public@file"
       - "traefik.http.services.cwa.loadbalancer.server.port=8083"
 
   bookbridge:

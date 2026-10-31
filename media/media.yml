@@ -297,6 +297,10 @@ services:
       - "traefik.http.routers.immich.rule=Host(`${HOST_IMMICH}`)"
       - "traefik.http.routers.immich.entrypoints=tunnel"
       - "traefik.http.routers.immich.middlewares=chain-public@file"
+      # Tailnet route for uploads over Cloudflare's 100 MB request body cap.
+      - "traefik.http.routers.immich-int.rule=Host(`immich.${INTERNAL_DOMAIN}`)"
+      - "traefik.http.routers.immich-int.entrypoints=websecure"
+      - "traefik.http.routers.immich-int.middlewares=chain-public@file"
       - "traefik.http.services.immich.loadbalancer.server.port=2283"
       
       
