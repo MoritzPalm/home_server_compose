@@ -125,9 +125,11 @@ services:
       - CLAUDE_MODEL=claude-opus-5-5
       - CLAUDE_TOOLS_MODEL=claude-haiku-5-5
       # Interface language only, since recipes keep their original language.
-      - OUTPUT_LANGUAGE=English
-      - TRANSLATE_RECIPES=false
+      - OUTPUT_LANGUAGE=Deutsch
+      - TRANSLATE_RECIPES=true
       - CONVERT_TO_METRIC=true
+      - SOURCE_TAG=true
+      - STEP_PHOTOS_AI=false
       - OCR_LANGUAGES=eng+deu
       - APP_URL=https://recipe-bridge.${INTERNAL_DOMAIN}
       - TZ=${TZ:-Europe/Berlin}
