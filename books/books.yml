@@ -8,6 +8,10 @@ services:
       - ${HOST_IP}:13378:80
     environment:
       - TZ=Europe/Berlin
+      # Default is 1h. Plappa does not refresh its token during playback, so
+      # progress syncs start failing with 401s an hour into a session. Refresh tokens last 30 days
+      # regardless.
+      - ACCESS_TOKEN_EXPIRY=86400
     volumes:
       - ${CONFIG_PATH}/audiobookshelf/config:/config
       - ${CONFIG_PATH}/audiobookshelf/absdata:/metadata
