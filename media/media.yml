@@ -102,7 +102,7 @@ services:
       - "traefik.http.services.soulsync.loadbalancer.server.port=8008"
 
   multi-scrobbler:
-    image: foxxmd/multi-scrobbler:0.18.1@sha256:f5c90df5c84839a443fd8ea36553706690b8a865a6cf6b4c74eb7d9ca47b820d
+    image: foxxmd/multi-scrobbler:0.20.3@sha256:74c306b059f6953bc38d69372ca57260b616f2d98502189d32e14caba3c9e419
     container_name: multi-scrobbler
     environment:
       - TZ=Europe/Berlin
