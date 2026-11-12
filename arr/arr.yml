@@ -284,7 +284,7 @@ services:
   # keeps myanonamouse/torrentleech torrents force-resumed (bypassing queueing limits)
   # so seeding points/ratio keep accruing even once qbittorrent's queueing is enabled
   qbit-force-seed:
-    image: python:3.12-alpine@sha256:6d43704baacd1bfbe7c295d7f13079d5d8104ed33568873133f8fc69980419df
+    image: python:3.14-alpine@sha256:a18b20ad69e74df6cf6d2e1b1a260d7a1ecf5380fd83b310f83ba88c461cf894
     container_name: qbit-force-seed
     depends_on:
       gluetun:
