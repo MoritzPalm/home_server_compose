@@ -1,11 +1,13 @@
-# Reference mirror of the Uptime Kuma stack that runs on the Pi monitor.
-# The live deployment is templated onto the Pi by the `pi_monitor` Ansible role
-# (roles/pi_monitor/templates/uptime-kuma.yml.j2); this copy exists only so the
-# stack is versioned alongside the others. Not deployed to mserver.
+# Uptime Kuma on the Pi monitor. Not deployed to mserver. The pi_monitor
+# Ansible role reads the image line from this file on GitHub, so this pin is
+# the one that runs and Renovate maintains it.
+#
+# Held on 1.x: the lucasheld.uptime_kuma collection that configures monitors
+# talks to Kuma through uptime-kuma-api, which supports 1.x only.
 services:
 
   uptime-kuma:
-    image: louislam/uptime-kuma:2@sha256:9912da7d7d9b6ddc0c2d904beb84d24689c1ed9c33b81419eb9008663a92a329
+    image: louislam/uptime-kuma:1.23.17@sha256:3d632903e6af34139a37f18055c4f1bfd9b7205ae1138f1e5e8940ddc1d176f9
     container_name: uptime-kuma
     volumes:
       - ${DATABASE_DIR}/uptime-kuma:/app/data

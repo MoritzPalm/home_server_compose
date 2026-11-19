@@ -99,8 +99,8 @@ services:
       # with basic auth, which a forward-auth redirect would break.
       - "traefik.http.routers.cwa.middlewares=chain-public@file"
       # Tailnet route for uploads over Cloudflare's 100 MB request body cap.
-      # OIDC redirects to HOST_CWA, so log in here with a local password.
-      - "traefik.http.routers.cwa-int.rule=Host(`cwa.${INTERNAL_DOMAIN}`)"
+      # OIDC works here too: the callback follows the request host.
+      - "traefik.http.routers.cwa-int.rule=Host(`books.${INTERNAL_DOMAIN}`)"
       - "traefik.http.routers.cwa-int.entrypoints=websecure"
       - "traefik.http.routers.cwa-int.middlewares=chain-public@file"
       - "traefik.http.services.cwa.loadbalancer.server.port=8083"

@@ -13,7 +13,7 @@ services:
       - HOMEPAGE_VAR_WEATHER_TIME=Europe/Berlin
       - HOMEPAGE_VAR_WEATHER_UNIT=metric
       - PORT=3123
-      - HOMEPAGE_ALLOWED_HOSTS=home.moritzpalm.com,${LAN_IP}:3123,${HOST_IP}:3123
+      - HOMEPAGE_ALLOWED_HOSTS=${HOST_HOMEPAGE},${LAN_IP}:3123,${HOST_IP}:3123
     volumes:
       - ${CONFIG_PATH}/homepage:/app/config
       - ${CONFIG_PATH}/homepage/data:/data
@@ -39,7 +39,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.homepage.entrypoints=tunnel"
-      - "traefik.http.routers.homepage.rule=Host(`home.moritzpalm.com`)"
+      - "traefik.http.routers.homepage.rule=Host(`${HOST_HOMEPAGE}`)"
       - "traefik.http.routers.homepage.middlewares=chain-sso@file"
       - "traefik.http.routers.homepage.service=homepage"
       - "traefik.http.services.homepage.loadbalancer.server.port=3123"

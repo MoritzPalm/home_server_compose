@@ -56,12 +56,11 @@
       "addLabels": ["update/security-patch"]
     },
     {
-      "description": "Pre-1.0 book stack. Shelfarr and BookBridge ship several releases a week, so their patch bumps are not the small, safe diffs the auto tier assumes — every update gets a PR. Kavita is here for a different reason: it shipped a critical security hotfix in 2026, so its updates have to be seen rather than merged silently. Calibre-Web Automated is here because ansible writes its SQLite settings tables directly, and any release can rename a column; the provisioning task fails loudly on that, but only once the update is already running.",
+      "description": "Pre-1.0 book stack. Shelfarr and BookBridge ship several releases a week, so their patch bumps are not the small, safe diffs the auto tier assumes — every update gets a PR. Calibre-Web Automated is here because ansible writes its SQLite settings tables directly, and any release can rename a column; the provisioning task fails loudly on that, but only once the update is already running.",
       "matchManagers": ["docker-compose"],
       "matchPackageNames": [
         "/shelfarr/",
         "/bookbridge/",
-        "/kavita/",
         "/calibre-web-automated/"
       ],
       "automerge": false,
@@ -73,6 +72,12 @@
       "matchPackageNames": ["/recipe-bridge/"],
       "automerge": false,
       "addLabels": ["update/review"]
+    },
+    {
+      "description": "Uptime Kuma stays on 1.x. Ansible configures its monitors through the lucasheld.uptime_kuma collection, whose uptime-kuma-api backend does not support 2.x. Lift once it does.",
+      "matchManagers": ["docker-compose"],
+      "matchPackageNames": ["louislam/uptime-kuma"],
+      "allowedVersions": "<2"
     },
     {
       "description": "Public ingress edge. A bad update to any of these takes every public hostname offline at once and is awkward to diagnose from outside the network, so they get a normal PR and never auto-merge. Paperless is included because it runs database migrations on start.",

@@ -1,0 +1,4 @@
+# Written by Ansible into each stack directory on the server. They hold secrets
+# and this repository is public.
+.env
+*.env
